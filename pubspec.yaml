@@ -8,6 +8,8 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
+  sensors_plus: ^6.0.0
+  audioplayers: ^6.0.0
   flutter:
     sdk: flutter
 
@@ -47,5 +49,9 @@ flutter:
     - assets/img/Extincteur.png
     - assets/img/SquatMiner.png
     - assets/img/RockyBalBoBo.png
+    - assets/img/game/bombe.png
+    - assets/img/game/explosion.png
+    - assets/sfx/explosion.mp3
+    - assets/sfx/tick.mp3
 
   uses-material-design: true
