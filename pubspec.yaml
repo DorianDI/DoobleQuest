@@ -33,5 +33,11 @@ flutter:
     - family: Lalezar
       fonts:
         - asset: assets/fonts/Lalezar-Regular.ttf
+    - family: Bangers
+      fonts:
+        - asset: assets/fonts/Bangers-Regular.ttf
+    - family: Caveat
+      fonts:
+        - asset: assets/fonts/Caveat-Regular.ttf
 
   uses-material-design: true
