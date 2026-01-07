@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'game/camillekaze/accueil.dart';
+import 'game/tirecowboy/accueil.dart';
+import 'game/extincteur/accueil.dart';
+import 'game/flashmcclou/accueil.dart';
+import 'game/rockybalbobo/accueil.dart';
+import 'game/squatminer/accueil.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent, // fond transparent
-      statusBarIconBrightness: Brightness.light, // ANDROID → icônes blanches
-      statusBarBrightness: Brightness.dark, // iOS → texte blanc
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      statusBarBrightness: Brightness.dark,
     ),
   );
   runApp(const MyApp());
@@ -20,7 +26,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        scaffoldBackgroundColor: const Color(0xFF1D132E),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
       ),
       home: const MyHomePage(),
     );
@@ -35,6 +45,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  final List<(String, Widget)> games = [
+    ('assets/img/TireCowBoy.png', const TireCowboyPage()),
+    ('assets/img/CamilleKaze.png', const CamilleKazePage()),
+    ('assets/img/FlashMcClou.png', const FlashMcClouPage()),
+    ('assets/img/Extincteur.png', const ExtincteurPage()),
+    ('assets/img/SquatMiner.png', const SquatMinerPage()),
+    ('assets/img/RockyBalBoBo.png', const RockyBalBoBoPage()),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Transform.translate(
                   offset: const Offset(-8, 4),
                   child: Text(
-                    'Dooble Quest',
+                    'Doodle Quest',
                     style: const TextStyle(
                       fontFamily: 'Bangers',
                       fontSize: 68,
@@ -60,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Text(
-                  'Dooble Quest',
+                  'Doodle Quest',
                   style: TextStyle(
                     fontFamily: 'Bangers',
                     fontSize: 68,
@@ -71,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 const Text(
-                  'Dooble Quest',
+                  'Doodle Quest',
                   style: TextStyle(
                     fontFamily: 'Bangers',
                     fontSize: 68,
@@ -96,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            SizedBox(height: 30,),
+            SizedBox(height: 15,),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -140,9 +159,46 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 15,
+              childAspectRatio: 1.10,
+              children: [
+                for (final g in games) _gridItem(context, g.$1, g.$2),
+              ],
+            )
           ],
         ),
       ),
     );
   }
+}
+
+Widget _gridItem(BuildContext context, String path, Widget page) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(50),
+    child: Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => page),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: Center(
+            child: SizedBox(
+              width: 160,
+              child: Image.asset(path, fit: BoxFit.contain),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }

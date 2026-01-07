@@ -40,4 +40,12 @@ flutter:
       fonts:
         - asset: assets/fonts/Caveat-Regular.ttf
 
+  assets:
+    - assets/img/TireCowBoy.png
+    - assets/img/CamilleKaze.png
+    - assets/img/FlashMcClou.png
+    - assets/img/Extincteur.png
+    - assets/img/SquatMiner.png
+    - assets/img/RockyBalBoBo.png
+
   uses-material-design: true
