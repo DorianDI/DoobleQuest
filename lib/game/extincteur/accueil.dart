@@ -16,13 +16,12 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
 
   @override
   Widget build(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(
-          color: Color(0xFF63CCE9),
-        ),
+        iconTheme: const IconThemeData(color: Color(0xFF63CCE9)),
       ),
       body: SafeArea(
         child: Column(
@@ -55,42 +54,60 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
               child: RichText(
                 textAlign: TextAlign.center,
                 text: const TextSpan(
-                  style: TextStyle(
-                    fontFamily: 'Caveat',
-                    fontSize: 36,
-                  ),
+                  style: TextStyle(fontFamily: 'Caveat', fontSize: 36),
                   children: [
-                    TextSpan(text: 'Souffle le plus ',
-                        style: TextStyle(color: Color(0xFF7C8ED0))),
-                    TextSpan(text: 'longtemps/fort ',
-                        style: TextStyle(color: Color(0xFFB3B3B3))),
                     TextSpan(
-                        text: '\npossible !', style: TextStyle(color: Color(0xFF7C8ED0))),
+                      text: 'Souffle le plus ',
+                      style: TextStyle(color: Color(0xFF7C8ED0)),
+                    ),
+                    TextSpan(
+                      text: 'longtemps/fort ',
+                      style: TextStyle(color: Color(0xFFB3B3B3)),
+                    ),
+                    TextSpan(
+                      text: '\npossible !',
+                      style: TextStyle(color: Color(0xFF7C8ED0)),
+                    ),
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 40),
             Column(
               children: const [
-                ModeCard(
-                  title: "Mode Timer",
-                  assetDecor: "assets/img/game/feu.png",
+                FractionallySizedBox(
+                  widthFactor: 0.80,
+                  child: ModeCard(
+                    title: "Mode Timer",
+                    decorFull: "assets/img/game/feu.png",
+                    decorHeight: 100,
+                    bottom: -15,
+                    scale: 1,
+                    fullFit: BoxFit.cover,
+                    fullBleed: true,
+                  ),
                 ),
-                SizedBox(height: 18),
-                ModeCard(
-                  title: "Mode Force",
-                  assetDecor: "assets/img/game/vent.png",
+                SizedBox(height: 25),
+                FractionallySizedBox(
+                  widthFactor: 0.80,
+                  child: ModeCard(
+                    title: "Mode Force",
+                    decorLeft: "assets/img/game/vent.png",
+                    decorRight: "assets/img/game/vent.png",
+                    decorHeight: 70,
+                    bottom: 20,
+                    scale: 1.0,
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 50),
+            const SizedBox(height: 40),
             Expanded(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24),
                   child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
+                    duration: Duration(milliseconds: 200),
                     child: _mainMenu(),
                   ),
                 ),
@@ -106,10 +123,7 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
     return Column(
       key: const ValueKey('mainMenu'),
       children: [
-        _bigButton(
-          label: 'DEMARRER !',
-          onTap: _onPlay,
-        ),
+        _bigButton(label: 'DEMARRER !', onTap: _onPlay),
         SizedBox(height: 20),
         Container(
           decoration: BoxDecoration(
@@ -120,7 +134,10 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -150,7 +167,11 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
               ),
               const SizedBox(height: 3),
               Padding(
-                padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),  // Léger padding
+                padding: const EdgeInsets.only(
+                  bottom: 8,
+                  left: 8,
+                  right: 8,
+                ), // Léger padding
                 child: Text(
                   "Mode Timer, Soufflez jusqu’a ce que le feu s’éteigne.\n Mode Force, Soufflez le plus fort possible pendant 5 seconde.",
                   style: TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
@@ -195,14 +216,34 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
 
 class ModeCard extends StatelessWidget {
   final String title;
-  final String assetDecor; // ex: "assets/flames.png"
+
+  // décor plein largeur (ex: feu)
+  final String? decorFull;
+
+  // décor gauche/droite (ex: tornades)
+  final String? decorLeft;
+  final String? decorRight;
+
   final double height;
+  final double decorHeight;
+  final double bottom;
+  final double scale;
+  final BoxFit fullFit;
+
+  final bool fullBleed;
 
   const ModeCard({
     super.key,
     required this.title,
-    required this.assetDecor,
-    this.height = 92,
+    this.decorFull,
+    this.decorLeft,
+    this.decorRight,
+    this.height = 120,
+    this.decorHeight = 60,
+    this.bottom = 10,
+    this.scale = 1.0,
+    this.fullFit = BoxFit.cover,
+    this.fullBleed = false,
   });
 
   @override
@@ -210,27 +251,62 @@ class ModeCard extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        color: const Color(0xFF2B2541), // fond violet sombre (adapte)
+        color: const Color(0xFF2B2541),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: const Color(0xFFB3B3B3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.35),
+            blurRadius: 12,
+            spreadRadius: 0,
+            offset: const Offset(0, 0),
+          ),
+        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: Stack(
           children: [
-            // Décor en bas (flammes / tornades)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Image.asset(
-                assetDecor,
-                fit: BoxFit.cover, // ou BoxFit.contain selon ton png
-                height: height * 0.75, // taille du décor
-              ),
-            ),
+            // ✅ décor plein largeur (FEU)
+            if (decorFull != null)
+              Positioned(
+                left: fullBleed ? -20 : 0,
+                right: fullBleed ? -20 : 0,
+                bottom: bottom,
+                height: decorHeight,
+                child: Transform.scale(
+                  scale: scale,
+                  alignment: Alignment.bottomCenter,
+                  child: Image.asset(
+                    decorFull!,
+                    width: double.infinity,
+                    height: decorHeight,
+                    fit: BoxFit.fitWidth,
+                    alignment: Alignment.bottomCenter,
+                  ),
 
-            // Texte centré + petit effet "shadow"
+                ),
+              ),
+
+            if (decorLeft != null)
+              Positioned(
+                left: 14,
+                bottom: bottom,
+                width: 70,
+                height: decorHeight,
+                child: Image.asset(decorLeft!, fit: BoxFit.contain),
+              ),
+
+            if (decorRight != null)
+              Positioned(
+                right: 14,
+                bottom: bottom,
+                width: 70,
+                height: decorHeight,
+                child: Image.asset(decorRight!, fit: BoxFit.contain),
+              ),
+
+            // Texte centré
             Center(
               child: Stack(
                 children: [
@@ -241,7 +317,7 @@ class ModeCard extends StatelessWidget {
                       style: const TextStyle(
                         fontFamily: 'Bangers',
                         fontSize: 18,
-                        color: Color(0xFF652208), // ombre/brun
+                        color: Color(0xFF652208),
                       ),
                     ),
                   ),
