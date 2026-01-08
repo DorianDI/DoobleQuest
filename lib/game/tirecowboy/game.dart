@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/services.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class TireCowboyGamePage extends StatefulWidget {
   const TireCowboyGamePage({super.key});
@@ -19,6 +20,8 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
   bool _isGameOver = false;
   String _message = "NE BOUGE PAS...";
 
+  final AudioPlayer _gunShoot = AudioPlayer();
+
   DateTime? _signalTime;
   Duration? _reactionTime;
   StreamSubscription? _accelSub;
@@ -28,6 +31,14 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
   void initState() {
     super.initState();
     _startDuel();
+  }
+
+  Future<void> _playShotSound() async {
+    try {
+      await _gunShoot.play(AssetSource('sfx/gun_shoot.mp3'));
+    } catch (e) {
+      debugPrint("Erreur son : $e");
+    }
   }
 
   void _startDuel() {
@@ -51,15 +62,20 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
       final force = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
 
       if (force > sensitivity) {
-        if (_isWaiting) {
-          _endGame("TROP TÔT !", "Faux départ, cowboy...", Colors.red);
-        } else {
-          final now = DateTime.now();
-          _reactionTime = now.difference(_signalTime!);
-          _endGame("PAN !", "${_reactionTime!.inMilliseconds} ms", const Color(0xFFF49A24));
-        }
+        _handleShoot();
       }
     });
+  }
+
+  void _handleShoot() {
+    if (_isWaiting) {
+      _endGame("TROP TÔT !", "Faux départ, cowboy...", Colors.red);
+    } else {
+      final now = DateTime.now();
+      _reactionTime = now.difference(_signalTime!);
+      _playShotSound(); // ON JOUE LE SON ICI
+      _endGame("PAN !", "${_reactionTime!.inMilliseconds} ms", const Color(0xFFF49A24));
+    }
   }
 
   void _endGame(String title, String sub, Color color) {
@@ -76,6 +92,7 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
   void dispose() {
     _accelSub?.cancel();
     _gameTimer?.cancel();
+    _gunShoot?.dispose();
     super.dispose();
   }
 
@@ -91,14 +108,25 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
         ),
       ),
       backgroundColor: const Color(0xFF1D132E),
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: _isWaiting ? Colors.transparent : const Color(0xFFF49A24).withOpacity(0.1),
-        ),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            if (!_isWaiting || _isGameOver)
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 200),
+                builder: (context, value, child) {
+                  return Transform.scale(scale: value, child: child);
+                },
+                child: Image.asset(
+                  'assets/img/game/cowboy_gun.png',
+                  width: 250,
+                ),
+              ),
+
+            const SizedBox(height: 30),
+
             Text(
               _message,
               textAlign: TextAlign.center,
