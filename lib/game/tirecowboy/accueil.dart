@@ -18,22 +18,26 @@ class TireCowboyPage extends StatelessWidget {
           child: Column(
             children: [
               Stack(
-                alignment: Alignment.center,
                 children: [
                   Transform.translate(
-                    offset: const Offset(-6, 3),
-                    child: const Text('TIRE, COWBOY !',
-                        style: TextStyle(fontFamily: 'Bangers', fontSize: 60, color: Color(0xFFF49A24))),
-                  ),
-                  Text(
-                    'TIRE, COWBOY !',
-                    style: TextStyle(
-                      fontFamily: 'Bangers', fontSize: 60,
-                      foreground: Paint()..style = PaintingStyle.stroke..strokeWidth = 3..color = Colors.black,
+                    offset: const Offset(-8, 3),
+                    child: const Text(
+                      'Tire, CowBoy !',
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 68,
+                        color: Color(0xC3A1620E),
+                      ),
                     ),
                   ),
-                  const Text('TIRE, COWBOY !',
-                      style: TextStyle(fontFamily: 'Bangers', fontSize: 60, color: Color(0xFFF49A24))),
+                  const Text(
+                    'Tire, CowBoy !',
+                    style: TextStyle(
+                      fontFamily: 'Bangers',
+                      fontSize: 68,
+                      color: Color(0xFFF49A24),
+                    ),
+                  ),
                 ],
               ),
               RichText(
@@ -125,9 +129,10 @@ class TireCowboyPage extends StatelessWidget {
           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TireCowboyGamePage())),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFF49A24), width: 1.5),
-            backgroundColor: Colors.black.withOpacity(0.2),
+            backgroundColor: Colors.black.withValues(alpha: 0.2),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(vertical: 12),
+            minimumSize: const Size(double.infinity, 50),
           ),
           child: const Text('DEMARRER !', style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Color(0xFFF49A24))),
         ),

@@ -1,104 +1,177 @@
 import 'package:flutter/material.dart';
 
-class ExtincteurPage extends StatelessWidget {
+class ExtincteurPage extends StatefulWidget {
   const ExtincteurPage({super.key});
+
+  @override
+  State<ExtincteurPage> createState() => _ExtincteurPageState();
+}
+
+class _ExtincteurPageState extends State<ExtincteurPage> {
+  bool _showPlayerChoice = false;
+
+  void _onPlay() {
+    setState(() => _showPlayerChoice = true);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: true,
         iconTheme: const IconThemeData(
-          color: Color(0xFFF49A24),
+          color: Color(0xFF63CCE9),
         ),
       ),
-      backgroundColor: const Color(0xFF1D132E),
-      body: Center(
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Stack(
               children: [
                 Transform.translate(
                   offset: const Offset(-8, 4),
-                  child: Text(
-                    'Extincteur',
-                    style: const TextStyle(
+                  child: const Text(
+                    "L'Extincteur",
+                    style: TextStyle(
                       fontFamily: 'Bangers',
                       fontSize: 68,
-                      color: Color(0xFFF49A24),
+                      color: Color(0xFF663A00),
                     ),
-                  ),
-                ),
-                Text(
-                  'Extincteur',
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 3
-                      ..color = Colors.black,
                   ),
                 ),
                 const Text(
-                  'Extincteur',
+                  "L'Extincteur",
                   style: TextStyle(
                     fontFamily: 'Bangers',
                     fontSize: 68,
-                    color: Color(0xFF571D7D),
+                    color: Color(0xFF63CCE9),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 15,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0x00F49A24), // transparent
-                        Color(0xFFF49A24), // plein
-                      ],
-                    ),
+            Transform.translate(
+              offset: const Offset(-8, 4),
+              child: RichText(
+                text: const TextSpan(
+                  style: TextStyle(
+                    fontFamily: 'Caveat',
+                    fontSize: 36,
+                  ),
+                  children: [
+                    TextSpan(text: 'Souffle le plus ',
+                        style: TextStyle(color: Color(0xFF7C8ED0))),
+                    TextSpan(text: 'longtemps/fort ',
+                        style: TextStyle(color: Color(0xFF63CCE9))),
+                    TextSpan(
+                        text: 'possible !', style: TextStyle(color: Color(0xFF7C8ED0))),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 50),
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: _mainMenu(),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF49A24),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 80,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFFF49A24),
-                        Color(0x00F49A24),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _mainMenu() {
+    return Column(
+      key: const ValueKey('mainMenu'),
+      children: [
+        _bigButton(
+          label: 'DEMARRER !',
+          onTap: _onPlay,
+        ),
+        SizedBox(height: 20),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Color(0xFF63CCE9)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Stack(
+                  children: [
+                    Transform.translate(
+                      offset: const Offset(-2, 3),
+                      child: const Text(
+                        'Comment jouer ?',
+                        style: TextStyle(
+                          fontFamily: 'Bangers',
+                          fontSize: 20,
+                          color: Color(0xFF652208),
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      'Comment jouer ?',
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 20,
+                        color: Color(0xFF63CCE9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 3),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),  // Léger padding
+                child: Text(
+                  "Mode Timer, Soufflez jusqu’a ce que le feu s’éteigne. Mode Force, Soufflez le plus fort possible pendant 5 seconde.",
+                  style: TextStyle(color: Color(0xFF63CCE9), fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bigButton({required String label, required VoidCallback onTap}) {
+    return SizedBox(
+      width: double.infinity,
+      height: 40,
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF63CCE9).withValues(alpha: 0.1),
+          foregroundColor: const Color(0xFF63CCE9),
+          elevation: 0,
+          side: const BorderSide(color: Color(0xFF63CCE9), width: 1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          minimumSize: const Size(double.infinity, 50),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Bangers',
+            fontSize: 22,
+            letterSpacing: 1,
+          ),
         ),
       ),
     );
