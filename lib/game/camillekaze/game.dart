@@ -25,7 +25,7 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
   final AudioPlayer _tickPlayer = AudioPlayer();
   final AudioPlayer _boomPlayer = AudioPlayer();
   bool _showExplosionFx = false;
-  final String _explodeReason = 'BOUM !';
+  String _explodeReason = 'BOUM !';
 
   bool _running = false;
   bool _exploded = false;
@@ -90,11 +90,14 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
     _stopAll();
     _scheduleTick();
     setState(() {
+      _showExplosionFx = false;
+      _explodeReason = '';
       _exploded = false;
       _running = true;
       _blinkOn = true;
       _elapsedMs = 0;
     });
+
 
     final seconds = widget.minSeconds + _rng.nextInt(widget.maxSeconds - widget.minSeconds + 1);
     _targetMs = seconds * 1000;
@@ -125,6 +128,7 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
     _stopAll();
 
     setState(() {
+      _explodeReason = reason;
       _running = false;
       _exploded = true;
       _showExplosionFx = true;
@@ -142,7 +146,6 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
     await Future.delayed(const Duration(milliseconds: 50));
     if (!mounted) return;
 
-    _showExplodeDialog(reason);
   }
 
   void _showExplodeDialog(String reason) {
@@ -240,45 +243,95 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!_showExplosionFx)
-              AnimatedOpacity(
-                opacity: _blinkOn ? 1.0 : 0.35,
-                duration: const Duration(milliseconds: 80),
-                child: Image.asset(
-                  'assets/img/game/bombe.png',
-                  width: 170,
-                  height: 170,
-                  fit: BoxFit.contain,
+            // Zone visuelle (bombe + explosion par-dessus)
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                // Bombe toujours visible (jeu + perdu)
+                AnimatedOpacity(
+                  opacity: (!_exploded && _blinkOn) ? 1.0 : 0.75, // un peu grisé en perdu
+                  duration: const Duration(milliseconds: 80),
+                  child: Image.asset(
+                    'assets/img/game/bombe.png',
+                    width: 170,
+                    height: 170,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-              ),
+
+                // Explosion par-dessus seulement pendant le FX
+                if (_showExplosionFx)
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.6, end: 1.2),
+                    duration: const Duration(milliseconds: 450),
+                    curve: Curves.easeOutBack,
+                    builder: (context, scale, child) {
+                      return Transform.scale(scale: scale, child: child);
+                    },
+                    child: Image.asset(
+                      'assets/img/game/explosion.png',
+                      width: 260,
+                      height: 260,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+              ],
+            ),
 
             const SizedBox(height: 20),
 
-            if (_running && !_exploded && !_showExplosionFx)
-              Text(
+            // Texte en mode jeu
+            if (!_exploded)
+              const Text(
                 'Passez à un autre joueur !',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white70,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
                 ),
+                textAlign: TextAlign.center,
               ),
 
-            if (_showExplosionFx)
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0.6, end: 1.2),
-                duration: const Duration(milliseconds: 450),
-                curve: Curves.easeOutBack,
-                builder: (context, scale, child) {
-                  return Transform.scale(scale: scale, child: child);
-                },
-                child: Image.asset(
-                  'assets/img/game/explosion.png',
-                  width: 260,
-                  height: 260,
+            // UI en mode perdu
+            if (_exploded) ...[
+              const Text(
+                'Vous avez perdu 💥',
+                style: TextStyle(
+                  color: Color(0xFFF49A24),
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
                 ),
+                textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 10),
+              Text(
+                _explodeReason,
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: _startRound,
+                    child: const Text(
+                      'Rejouer',
+                      style: TextStyle(color: Color(0xFF7C8ED0), fontSize: 18),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'Quitter',
+                      style: TextStyle(color: Color(0xFF7C8ED0), fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
