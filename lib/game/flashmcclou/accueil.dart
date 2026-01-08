@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'game.dart';
 
 class FlashMcClouPage extends StatefulWidget {
   const FlashMcClouPage({super.key});
@@ -8,10 +9,11 @@ class FlashMcClouPage extends StatefulWidget {
 }
 
 class _FlashMcClouPageState extends State<FlashMcClouPage> {
-  bool _showPlayerChoice = false;
 
   void _onPlay() {
-    setState(() => _showPlayerChoice = true);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const FlashMcClouGamePage()),
+    );
   }
 
   @override
