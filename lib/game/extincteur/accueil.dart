@@ -45,14 +45,15 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
                   style: TextStyle(
                     fontFamily: 'Bangers',
                     fontSize: 68,
-                    color: Color(0xFF63CCE9),
+                    color: Color(0xFFB3B3B3),
                   ),
                 ),
               ],
             ),
             Transform.translate(
-              offset: const Offset(-8, 4),
+              offset: const Offset(-6, 4),
               child: RichText(
+                textAlign: TextAlign.center,
                 text: const TextSpan(
                   style: TextStyle(
                     fontFamily: 'Caveat',
@@ -62,12 +63,26 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
                     TextSpan(text: 'Souffle le plus ',
                         style: TextStyle(color: Color(0xFF7C8ED0))),
                     TextSpan(text: 'longtemps/fort ',
-                        style: TextStyle(color: Color(0xFF63CCE9))),
+                        style: TextStyle(color: Color(0xFFB3B3B3))),
                     TextSpan(
-                        text: 'possible !', style: TextStyle(color: Color(0xFF7C8ED0))),
+                        text: '\npossible !', style: TextStyle(color: Color(0xFF7C8ED0))),
                   ],
                 ),
               ),
+            ),
+            SizedBox(height: 50),
+            Column(
+              children: const [
+                ModeCard(
+                  title: "Mode Timer",
+                  assetDecor: "assets/img/game/feu.png",
+                ),
+                SizedBox(height: 18),
+                ModeCard(
+                  title: "Mode Force",
+                  assetDecor: "assets/img/game/vent.png",
+                ),
+              ],
             ),
             SizedBox(height: 50),
             Expanded(
@@ -100,7 +115,7 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
           decoration: BoxDecoration(
             color: Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Color(0xFF63CCE9)),
+            border: Border.all(color: Color(0xFFB3B3B3)),
           ),
           child: Column(
             children: [
@@ -127,7 +142,7 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
                       style: TextStyle(
                         fontFamily: 'Bangers',
                         fontSize: 20,
-                        color: Color(0xFF63CCE9),
+                        color: Color(0xFFB3B3B3),
                       ),
                     ),
                   ],
@@ -137,8 +152,8 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),  // Léger padding
                 child: Text(
-                  "Mode Timer, Soufflez jusqu’a ce que le feu s’éteigne. Mode Force, Soufflez le plus fort possible pendant 5 seconde.",
-                  style: TextStyle(color: Color(0xFF63CCE9), fontSize: 14),
+                  "Mode Timer, Soufflez jusqu’a ce que le feu s’éteigne.\n Mode Force, Soufflez le plus fort possible pendant 5 seconde.",
+                  style: TextStyle(color: Color(0xFFB3B3B3), fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -156,10 +171,10 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF63CCE9).withValues(alpha: 0.1),
-          foregroundColor: const Color(0xFF63CCE9),
+          backgroundColor: const Color(0xFFB3B3B3).withValues(alpha: 0.1),
+          foregroundColor: const Color(0xFFB3B3B3),
           elevation: 0,
-          side: const BorderSide(color: Color(0xFF63CCE9), width: 1),
+          side: const BorderSide(color: Color(0xFFB3B3B3), width: 1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -172,6 +187,77 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
             fontSize: 22,
             letterSpacing: 1,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ModeCard extends StatelessWidget {
+  final String title;
+  final String assetDecor; // ex: "assets/flames.png"
+  final double height;
+
+  const ModeCard({
+    super.key,
+    required this.title,
+    required this.assetDecor,
+    this.height = 92,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2B2541), // fond violet sombre (adapte)
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFB3B3B3)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Stack(
+          children: [
+            // Décor en bas (flammes / tornades)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Image.asset(
+                assetDecor,
+                fit: BoxFit.cover, // ou BoxFit.contain selon ton png
+                height: height * 0.75, // taille du décor
+              ),
+            ),
+
+            // Texte centré + petit effet "shadow"
+            Center(
+              child: Stack(
+                children: [
+                  Transform.translate(
+                    offset: const Offset(-2, 2),
+                    child: Text(
+                      title.toUpperCase(),
+                      style: const TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 18,
+                        color: Color(0xFF652208), // ombre/brun
+                      ),
+                    ),
+                  ),
+                  Text(
+                    title.toUpperCase(),
+                    style: const TextStyle(
+                      fontFamily: 'Bangers',
+                      fontSize: 18,
+                      color: Color(0xFFB3B3B3),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

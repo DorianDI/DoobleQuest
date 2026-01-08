@@ -55,5 +55,7 @@ flutter:
     - assets/sfx/tick.mp3
     - assets/img/game/cowboy_bg.png
     - assets/img/game/cowboy_gun.png
+    - assets/img/game/feu.png
+    - assets/img/game/vent.png
 
   uses-material-design: true
