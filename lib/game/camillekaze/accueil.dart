@@ -25,9 +25,9 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
       backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Color(0xFFF49A24)),
+        iconTheme: const IconThemeData(
+          color: Color(0xFFF49A24),
+        ),
       ),
       body: SafeArea(
         child: Column(
@@ -41,19 +41,8 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
                     style: TextStyle(
                       fontFamily: 'Bangers',
                       fontSize: 68,
-                      color: Color(0xFFF49A24),
+                      color: Color(0xFF663A00),
                     ),
-                  ),
-                ),
-                Text(
-                  'CamilleKaze',
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 3
-                      ..color = Colors.black,
                   ),
                 ),
                 const Text(
@@ -61,54 +50,66 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
                   style: TextStyle(
                     fontFamily: 'Bangers',
                     fontSize: 68,
-                    color: Color(0xFF571D7D),
+                    color: Color(0xFFF84C08),
                   ),
                 ),
               ],
             ),
-
-            const SizedBox(height: 8),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Transform.translate(
+              offset: const Offset(-8, 4),
+              child: RichText(
+                text: const TextSpan(
+                  style: TextStyle(
+                    fontFamily: 'Caveat',
+                    fontSize: 36,
+                  ),
+                  children: [
+                    TextSpan(text: 'Passe la ',
+                        style: TextStyle(color: Color(0xFF7C8ED0))),
+                    TextSpan(text: 'Bombe ',
+                        style: TextStyle(color: Color(0xFFF84C08))),
+                    TextSpan(
+                        text: '!', style: TextStyle(color: Color(0xFF7C8ED0))),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 50),
+            Stack(
+              alignment: Alignment.center,
               children: [
                 Container(
-                  width: 80,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0x00F49A24),
-                        Color(0xFFF49A24),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF49A24),
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
+                    color: Colors.transparent,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Color(0xFFF84C08),
+                          blurRadius: 100,
+                          spreadRadius: 5
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
                 Container(
-                  width: 80,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFFF49A24),
-                        Color(0x00F49A24),
-                      ],
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF1D132E),
+                    border: Border.all(
+                      color: Color(0xFFF84C08),
+                      width: 1,
                     ),
                   ),
+                ),
+                Image.asset(
+                  'assets/img/game/bombe.png',
+                  width: 210,
+                  height: 210,
+                  fit: BoxFit.contain,
                 ),
               ],
             ),
@@ -137,23 +138,58 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
       key: const ValueKey('mainMenu'),
       children: [
         _bigButton(
-          label: 'PLAY',
-           onTap: _onPlay,
+          label: 'DEMARRER !',
+          onTap: _onPlay,
         ),
-        const SizedBox(height: 12),
-        //_bigButton(
-        //  label: 'HISTORIQUE',
-        //  onTap: () {
-            // TODO: page historique plus tard
-        //    ScaffoldMessenger.of(context).showSnackBar(
-        //      const SnackBar(content: Text('Historique bientôt 👀')),
-        //    );
-        //  },
-        //),
-        //SizedBox(height: 12),
-        _bigButton(
-          label: 'RÈGLES',
-          onTap: _showRules,
+        SizedBox(height: 20),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Color(0xFFF84C08)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Stack(
+                  children: [
+                    Transform.translate(
+                      offset: const Offset(-2, 3),
+                      child: const Text(
+                        'Comment jouer ?',
+                        style: TextStyle(
+                          fontFamily: 'Bangers',
+                          fontSize: 20,
+                          color: Color(0xFF663A00),
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      'Comment jouer ?',
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 20,
+                        color: Color(0xFFF84C08),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 3),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),  // Léger padding
+                child: Text(
+                  "La bombe va exploser! Passez le téléphone à un ami avant la fin du temps. Attention: Si vous le passez trop vite, la bombe explose immédiatement!",
+                  style: TextStyle(color: Color(0xFFF84C08), fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -169,7 +205,8 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const CamilleKazeGamePage(minSeconds: 20, maxSeconds: 30),
+                builder: (_) =>
+                const CamilleKazeGamePage(minSeconds: 20, maxSeconds: 30),
               ),
             );
           },
@@ -181,13 +218,13 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const CamilleKazeGamePage(minSeconds: 40, maxSeconds: 55),
+                builder: (_) =>
+                const CamilleKazeGamePage(minSeconds: 40, maxSeconds: 55),
               ),
             );
           },
         ),
         const SizedBox(height: 16),
-
         TextButton(
           onPressed: _onBackToMenu,
           child: const Text(
@@ -202,16 +239,18 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
   Widget _bigButton({required String label, required VoidCallback onTap}) {
     return SizedBox(
       width: double.infinity,
-      height: 56,
+      height: 40,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF571D7D),
-          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFFF84C08).withValues(alpha: 0.1),
+          foregroundColor: const Color(0xFFF84C08),
           elevation: 0,
+          side: const BorderSide(color: Color(0xFFF84C08), width: 1),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(10),
           ),
+          minimumSize: const Size(double.infinity, 50),
         ),
         child: Text(
           label,
@@ -222,44 +261,6 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
           ),
         ),
       ),
-    );
-  }
-
-  void _showRules() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: const Color(0xFF1D132E),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: DefaultTextStyle(
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              height: 1.3,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Règles — CamilleKaze', style: TextStyle(fontFamily: 'Bangers', fontSize: 28, color: Color(0xFFF49A24))),
-                SizedBox(height: 12),
-                Text('• Une bombe est affichée à l’écran.'),
-                Text('• Elle explose après un temps aléatoire.'),
-                Text('• Les joueurs se passent le téléphone : celui qui l’a quand ça explose perd la manche.'),
-                Text('• Si le téléphone est donné trop brusquement → explosion immédiate.'),
-                SizedBox(height: 12),
-                Text('Temps :'),
-                Text('• Mode 1–5 joueurs : explosion entre 20s et 30s.'),
-                Text('• Mode 5–15 joueurs : explosion entre 40s et 55s.'),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }
