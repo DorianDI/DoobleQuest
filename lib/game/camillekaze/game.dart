@@ -48,13 +48,6 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
     }
   }
 
-
-  Future<void> _stopTickLoop() async {
-    try {
-      await _tickPlayer.stop();
-    } catch (_) {}
-  }
-
   Future<void> _playBoom() async {
     try {
       await _boomPlayer.play(AssetSource('sfx/explosion.mp3')); // ✅ sans "assets/"
@@ -146,36 +139,6 @@ class _CamilleKazeGamePageState extends State<CamilleKazeGamePage> {
     await Future.delayed(const Duration(milliseconds: 50));
     if (!mounted) return;
 
-  }
-
-  void _showExplodeDialog(String reason) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1D132E),
-          title: const Text('💥 EXPLOSION', style: TextStyle(color: Color(0xFFF49A24))),
-          content: Text(reason, style: const TextStyle(color: Colors.white)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _startRound(); // relance une manche
-              },
-              child: const Text('Rejouer', style: TextStyle(color: Color(0xFF7C8ED0))),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context); // retour page précédente
-              },
-              child: const Text('Quitter', style: TextStyle(color: Color(0xFF7C8ED0))),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _scheduleBlink() {

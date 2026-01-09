@@ -92,7 +92,7 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
   void dispose() {
     _accelSub?.cancel();
     _gameTimer?.cancel();
-    _gunShoot?.dispose();
+    _gunShoot.dispose();
     super.dispose();
   }
 

@@ -16,7 +16,6 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(

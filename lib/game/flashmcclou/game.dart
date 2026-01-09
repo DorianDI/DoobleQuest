@@ -197,7 +197,7 @@ class _FlashMcClouGamePageState extends State<FlashMcClouGamePage> {
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF63CCE9).withOpacity(0.10),
+          backgroundColor: const Color(0xFF63CCE9).withValues(alpha: 0.10),
           foregroundColor: const Color(0xFF63CCE9),
           elevation: 0,
           side: const BorderSide(color: Color(0xFF63CCE9), width: 1),

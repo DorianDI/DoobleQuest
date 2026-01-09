@@ -108,7 +108,7 @@ class TireCowboyPage extends StatelessWidget {
             width: 250, height: 250,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: const Color(0xFFF49A24).withOpacity(0.3), blurRadius: 50, spreadRadius: 10)],
+              boxShadow: [BoxShadow(color: const Color(0xFFF49A24).withValues(alpha: 0.3), blurRadius: 50, spreadRadius: 10)],
             ),
           ),
           ClipOval(
@@ -147,8 +147,8 @@ class TireCowboyPage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: const Color(0xFFF49A24).withOpacity(0.5)),
-          color: Colors.black.withOpacity(0.1),
+          border: Border.all(color: const Color(0xFFF49A24).withValues(alpha: 0.5)),
+          color: Colors.black.withValues(alpha: 0.1),
         ),
         child: const Column(
           children: [
