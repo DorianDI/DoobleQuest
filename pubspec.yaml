@@ -9,13 +9,15 @@ environment:
 
 dependencies:
   sensors_plus: ^6.0.0
-  audioplayers: ^6.0.0
+  audioplayers: ^6.5.1
   noise_meter: ^5.1.0
   permission_handler: ^12.0.1
   flutter:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  google_mlkit_pose_detection: ^0.14.0
+  camera: ^0.11.3
 
 dev_dependencies:
   flutter_test:
@@ -51,16 +53,20 @@ flutter:
     - assets/img/Extincteur.png
     - assets/img/SquatMiner.png
     - assets/img/RockyBalBoBo.png
-    - assets/img/game/bombe.png
-    - assets/img/game/explosion.png
     - assets/sfx/explosion.mp3
     - assets/sfx/tick.mp3
     - assets/sfx/coin.mp3
+    - assets/sfx/coup_de_poing.mp3
+    - assets/sfx/gun_shoot.mp3
+    - assets/img/game/bombe.png
+    - assets/img/game/explosion.png
     - assets/img/game/cowboy_bg.png
     - assets/img/game/cowboy_gun.png
     - assets/img/game/feu.png
     - assets/img/game/vent.png
     - assets/img/game/gemme.png
     - assets/img/game/fond_mine.png
+    - assets/img/game/gant.png
+    - assets/img/game/ring.png
 
   uses-material-design: true
