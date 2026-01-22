@@ -18,7 +18,7 @@ class _RockyCameraViewState extends State<RockyCameraView> {
   bool _isProcessing = false;
   int _score = 0;
   bool _isExtended = false;
-  String _debugDistance = "Attente d'humain...";
+  String _debugDistance = "Initialisation...";
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   final PoseDetector _poseDetector = PoseDetector(
@@ -31,7 +31,6 @@ class _RockyCameraViewState extends State<RockyCameraView> {
     _initializeCamera();
   }
 
-  // Initialisation de la caméra et branchement de l'IA
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
     final frontCamera = cameras.firstWhere(
@@ -43,11 +42,12 @@ class _RockyCameraViewState extends State<RockyCameraView> {
       frontCamera,
       ResolutionPreset.medium,
       enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420, // Format standard Android
+      imageFormatGroup: ImageFormatGroup.yuv420,
     );
 
     await _controller?.initialize();
 
+    // Lancement du flux d'images
     _controller?.startImageStream((CameraImage image) async {
       if (_isProcessing) return;
       _isProcessing = true;
@@ -59,7 +59,7 @@ class _RockyCameraViewState extends State<RockyCameraView> {
           if (poses.isNotEmpty) {
             _detectPunch(poses.first);
           } else {
-            setState(() => _debugDistance = "Personne détectée");
+            if (mounted) setState(() => _debugDistance = "Cherche humain...");
           }
         }
       } catch (e) {
@@ -71,9 +71,7 @@ class _RockyCameraViewState extends State<RockyCameraView> {
     if (mounted) setState(() {});
   }
 
-  // Logique de détection de coup de poing (Mathématique et Physique)
   void _detectPunch(Pose pose) {
-    // On récupère les points des deux bras pour plus de fiabilité
     final rShoulder = pose.landmarks[PoseLandmarkType.rightShoulder];
     final rWrist = pose.landmarks[PoseLandmarkType.rightWrist];
     final lShoulder = pose.landmarks[PoseLandmarkType.leftShoulder];
@@ -81,24 +79,24 @@ class _RockyCameraViewState extends State<RockyCameraView> {
 
     double maxDistance = 0;
 
-    // Calcul de la distance pour le bras droit : $d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$
+    // Calcul de la distance euclidienne
     if (rShoulder != null && rWrist != null) {
       maxDistance = sqrt(pow(rWrist.x - rShoulder.x, 2) + pow(rWrist.y - rShoulder.y, 2));
     }
 
-    // On vérifie aussi le bras gauche (si l'utilisateur est tourné dans l'autre sens)
     if (lShoulder != null && lWrist != null) {
       double distL = sqrt(pow(lWrist.x - lShoulder.x, 2) + pow(lWrist.y - lShoulder.y, 2));
       if (distL > maxDistance) maxDistance = distL;
     }
 
-    // MISE À JOUR DU DEBUG : Pour voir si le téléphone te "sent"
-    setState(() {
-      _debugDistance = "Distance : ${maxDistance.toStringAsFixed(0)} px";
-    });
+    if (mounted) {
+      setState(() {
+        _debugDistance = "Distance : ${maxDistance.toStringAsFixed(0)} px";
+      });
+    }
 
-    // SEUIL DE VALIDATION (Ajusté à 170 pour plus de souplesse)
-    const double punchThreshold = 170.0;
+    // Seuil de détection (Threshold)
+    const double punchThreshold = 150.0;
 
     if (!_isExtended && maxDistance > punchThreshold) {
       setState(() {
@@ -108,12 +106,10 @@ class _RockyCameraViewState extends State<RockyCameraView> {
       _playPunchSound();
       HapticFeedback.heavyImpact(); // Vibration Android
     } else if (maxDistance < punchThreshold * 0.6) {
-      // On réinitialise quand le poing revient vers l'épaule
       if (mounted) setState(() => _isExtended = false);
     }
   }
 
-  // Convertisseur technique indispensable pour Android
   InputImage? _inputImageFromCameraImage(CameraImage image) {
     final format = InputImageFormatValue.fromRawValue(image.format.raw);
     if (format == null) return null;
@@ -124,7 +120,8 @@ class _RockyCameraViewState extends State<RockyCameraView> {
       bytes: plane.bytes,
       metadata: InputImageMetadata(
         size: Size(image.width.toDouble(), image.height.toDouble()),
-        rotation: InputImageRotation.rotation270deg, // Rotation spécifique Android
+        // IMPORTANT : Rotation 270 pour la majorité des Android en portrait
+        rotation: InputImageRotation.rotation270deg,
         format: format,
         bytesPerRow: plane.bytesPerRow,
       ),
@@ -153,13 +150,27 @@ class _RockyCameraViewState extends State<RockyCameraView> {
       return const Scaffold(backgroundColor: Colors.black, body: Center(child: CircularProgressIndicator()));
     }
 
+    // Calcul pour éviter l'étirement (visage allongé)
+    var scale = 1 / (_controller!.value.aspectRatio * MediaQuery.of(context).size.aspectRatio);
+    if (scale < 1) scale = 1 / scale;
+
     return Scaffold(
       body: Stack(
         children: [
-          // 1. La Caméra
-          SizedBox.expand(child: CameraPreview(_controller!)),
+          // 1. Caméra avec correction du ratio (Transform + AspectRatio)
+          ClipRect(
+            child: Transform.scale(
+              scale: scale,
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: _controller!.value.aspectRatio,
+                  child: CameraPreview(_controller!),
+                ),
+              ),
+            ),
+          ),
 
-          // 2. Overlay de Debug (Le chiffre rouge en haut)
+          // 2. Texte de Debug
           Positioned(
             top: 50, left: 20,
             child: Container(
@@ -169,26 +180,28 @@ class _RockyCameraViewState extends State<RockyCameraView> {
             ),
           ),
 
-          // 3. Le Score au centre
+          // 3. Score
           Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('$_score',
-                  style: const TextStyle(
-                      fontFamily: 'Bangers', fontSize: 130, color: Colors.white,
-                      shadows: [Shadow(blurRadius: 20, color: Colors.black)]
-                  ),
-                ),
-                Text(_isExtended ? "BAM !" : "",
-                    style: const TextStyle(fontFamily: 'Bangers', fontSize: 40, color: Colors.redAccent)),
-              ],
+            child: Text('$_score',
+              style: const TextStyle(
+                  fontFamily: 'Bangers', fontSize: 150, color: Colors.white,
+                  shadows: [Shadow(blurRadius: 20, color: Colors.black)]
+              ),
             ),
           ),
 
-          // 4. Bouton Quitter
+          // 4. Feedback visuel BAM
+          if (_isExtended)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.only(top: 200),
+                child: Text("BAM !", style: TextStyle(fontFamily: 'Bangers', fontSize: 60, color: Colors.redAccent)),
+              ),
+            ),
+
+          // 5. Quitter
           Positioned(
-            bottom: 30, left: 20,
+            top: 40, right: 20,
             child: IconButton(
               icon: const Icon(Icons.close, color: Colors.white, size: 40),
               onPressed: () => Navigator.pop(context),
