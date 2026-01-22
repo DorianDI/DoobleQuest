@@ -1,193 +1,240 @@
 import 'package:flutter/material.dart';
+// Assurez-vous que ce fichier existe et contient SquatMinerGamePage
 import 'game.dart';
 
-class SquatMinerPage extends StatelessWidget {
+class SquatMinerPage extends StatefulWidget {
   const SquatMinerPage({super.key});
+
+  @override
+  State<SquatMinerPage> createState() => _SquatMinerPageState();
+}
+
+class _SquatMinerPageState extends State<SquatMinerPage> {
+  // Définition des couleurs principales de la maquette
+  final Color _neonGreen = const Color(0xFF39FF14); // Vert fluo pour le texte et les bordures
+  final Color _darkGreenButton = const Color(0xFF1A3311); // Vert foncé pour le fond du bouton
+
+  void _onPlay() {
+    // Navigation vers la page de jeu (assurez-vous que SquatMinerGamePage existe dans game.dart)
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SquatMinerGamePage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Couleur de fond foncée de la maquette
+      backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        automaticallyImplyLeading: true,
-        iconTheme: const IconThemeData(
-          color: Color(0xFFF49A24),
+        iconTheme: IconThemeData(
+          color: _neonGreen, // Icône retour en vert fluo
         ),
       ),
-      backgroundColor: const Color(0xFF1D132E),
-      body: SingleChildScrollView(
-        child: Center(
+      body: SafeArea(
+        // Utilisation de SingleChildScrollView pour éviter les dépassements sur petits écrans
+        child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // --- TON TITRE STYLISÉ ---
+              // --- TITRE PRINCIPAL ---
               Stack(
-                alignment: Alignment.center,
                 children: [
+                  // Ombre/Contour du texte
                   Transform.translate(
-                    offset: const Offset(-8, 4),
-                    child: const Text(
-                      'SquatMiner',
+                    offset: const Offset(-4, 4),
+                    child: Text(
+                      'SQUAT MINER',
                       style: TextStyle(
                         fontFamily: 'Bangers',
                         fontSize: 68,
-                        color: Color(0xFFF49A24),
+                        // Un vert très foncé pour l'ombre
+                        color: Colors.black.withOpacity(0.5),
                       ),
                     ),
                   ),
+                  // Texte principal vert fluo
                   Text(
-                    'SquatMiner',
+                    'SQUAT MINER',
                     style: TextStyle(
-                      fontFamily: 'Bangers',
-                      fontSize: 68,
-                      foreground: Paint()
-                        ..style = PaintingStyle.stroke
-                        ..strokeWidth = 3
-                        ..color = Colors.black,
-                    ),
-                  ),
-                  const Text(
-                    'SquatMiner',
-                    style: TextStyle(
-                      fontFamily: 'Bangers',
-                      fontSize: 68,
-                      color: Color(0xFF571D7D),
+                        fontFamily: 'Bangers',
+                        fontSize: 68,
+                        color: _neonGreen,
+                        shadows: [
+                          Shadow(blurRadius: 10, color: _neonGreen.withOpacity(0.5))
+                        ]
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 15),
-
-              // --- TA LIGNE DÉCORATIVE ---
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 80, height: 2,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0x00F49A24), Color(0xFFF49A24)],
-                      ),
+              // --- SOUS-TITRE RICHTEXT ---
+              Transform.translate(
+                offset: const Offset(-8, 4),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontFamily: 'Caveat', // Ou une autre police manuscrite si celle-ci ne correspond pas exactement
+                      fontSize: 28,
+                      color: Colors.white, // Couleur par défaut blanche
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 20, height: 20,
-                    decoration: const BoxDecoration(color: Color(0xFFF49A24), shape: BoxShape.circle),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 80, height: 2,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Color(0xFFF49A24), Color(0x00F49A24)],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              // --- AJOUT : L'ILLUSTRATION (Cercle + Mineur) ---
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    width: 260, height: 260,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFF49A24).withOpacity(0.3),
-                          blurRadius: 60,
-                        ),
-                      ],
-                    ),
-                  ),
-                  ClipOval(
-                    child: Image.asset(
-                      'assets/img/game/fond_mine.png',
-                      width: 260, height: 260,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Image.asset(
-                    'assets/img/game/gemme.png',
-                    width: 180,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              // --- AJOUT : BOUTON DEMARRER ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SquatMinerGamePage()),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFF49A24), width: 1.5),
-                      backgroundColor: Colors.black.withOpacity(0.2),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text(
-                      'MINER !',
-                      style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Color(0xFFF49A24)),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // --- AJOUT : INSTRUCTIONS ---
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: const Color(0xFFF49A24).withOpacity(0.5)),
-                    color: Colors.black.withOpacity(0.1),
-                  ),
-                  child: const Column(
                     children: [
-                      Text('COMMENT JOUER ?', style: TextStyle(fontFamily: 'Bangers', fontSize: 20, color: Color(0xFFF49A24))),
-                      SizedBox(height: 10),
-                      Text(
-                        'Tenez le téléphone bras tendus devant vous. Faites un squat complet pour récolter une gemme ! Pas de temps limite.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFFF49A24), fontSize: 14),
-                      ),
+                      const TextSpan(text: 'Ramasse le plus de '),
+                      TextSpan(
+                          text: 'gemme ',
+                          // Mot clé en vert fluo
+                          style: TextStyle(color: _neonGreen, fontWeight: FontWeight.bold)),
+                      const TextSpan(text: 'possible !'),
                     ],
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
 
-              // --- AJOUT : BOUTON RETOUR ---
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('RETOUR', style: TextStyle(fontFamily: 'Bangers', color: Color(0xFF7C8ED0), fontSize: 20)),
+              // --- VISUEL CENTRAL (Cercle Mine + Gemme) ---
+              // Remplacement du CustomPaint (clou) par une Stack d'images
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Effet de lueur verte derrière le cercle
+                  Container(
+                    width: 270,
+                    height: 270,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: _neonGreen.withOpacity(0.4),
+                          blurRadius: 50,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // L'image de fond de la mine, découpée en cercle
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/img/game/fond_mine.png', // Chemin à adapter selon votre projet
+                      width: 260,
+                      height: 260,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  // L'image de la gemme par-dessus
+                  Image.asset(
+                    'assets/img/game/gemme.png', // Chemin à adapter selon votre projet
+                    width: 200, // Ajustez la taille selon votre image
+                    fit: BoxFit.contain,
+                  ),
+                ],
               ),
+
               const SizedBox(height: 40),
+
+              // --- MENU PRINCIPAL ---
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                // Utilisation d'une transition fluide si le menu change
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _mainMenu(),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _mainMenu() {
+    return Column(
+      key: const ValueKey('mainMenu'),
+      children: [
+        // Bouton DEMARRER
+        _bigButton(
+          label: 'DEMARRER !',
+          onTap: _onPlay,
+        ),
+        const SizedBox(height: 30),
+
+        // --- BOITE "COMMENT JOUER" ---
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.3), // Fond légèrement plus foncé
+            borderRadius: BorderRadius.circular(15),
+            // Bordure vert fluo
+            border: Border.all(color: _neonGreen, width: 2),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              // Titre de la boîte
+              Text(
+                'COMMENT JOUER ?',
+                style: TextStyle(
+                  fontFamily: 'Bangers',
+                  fontSize: 22,
+                  color: _neonGreen, // Titre en vert fluo
+                ),
+              ),
+              const SizedBox(height: 5),
+              // Texte explicatif
+              const Padding(
+                padding: EdgeInsets.only(bottom: 15, left: 15, right: 15),
+                child: Text(
+                  "Tenez le téléphone bras tendus devant vous et faites des squats! Chaque squat ramasse une gemme. Si vous ne descendez pas assez bas vous ne récolterez pas de gemme !",
+                  style: TextStyle(
+                      color: Colors.white70, // Texte blanc cassé pour la lisibilité
+                      fontSize: 14,
+                      height: 1.3
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Widget de bouton personnalisé adapté à la nouvelle charte graphique
+  Widget _bigButton({required String label, required VoidCallback onTap}) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55, // Bouton légèrement plus haut
+      child: ElevatedButton(
+        onPressed: onTap,
+        style: ElevatedButton.styleFrom(
+          // Couleur de fond vert foncé
+          backgroundColor: _darkGreenButton,
+          // Couleur du texte vert fluo
+          foregroundColor: _neonGreen,
+          elevation: 5,
+          shadowColor: _neonGreen.withOpacity(0.3),
+          // Bordure vert fluo
+          side: BorderSide(color: _neonGreen, width: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+              fontFamily: 'Bangers',
+              fontSize: 24,
+              letterSpacing: 2,
+              fontStyle: FontStyle.italic // Ajout de l'italique comme sur la maquette
+          ),
+        ),
+      ),
+    );
+  }
 }
+
+// Le NailPainter a été supprimé car il n'est plus utilisé dans cette maquette.
