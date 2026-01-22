@@ -17,11 +17,12 @@ class _ExtincteurTimerGamePageState extends State<ExtincteurTimerGamePage> {
 
   bool isBlowing = false;
   bool permissionGranted = false;
+  bool hasFinished = false; // Nouveau : pour savoir si on a fini
 
   double currentTime = 0;
   Timer? timer;
 
-  final double blowThreshold = 75;
+  final double blowThreshold = 67.5;
 
   @override
   void initState() {
@@ -49,7 +50,6 @@ class _ExtincteurTimerGamePageState extends State<ExtincteurTimerGamePage> {
       });
       startListening();
     } else {
-      // Permission refusée
       if (mounted) {
         showDialog(
           context: context,
@@ -80,6 +80,9 @@ class _ExtincteurTimerGamePageState extends State<ExtincteurTimerGamePage> {
   }
 
   void onData(NoiseReading noiseReading) {
+    // Si on a déjà fini, on n'écoute plus le micro
+    if (hasFinished) return;
+
     double volume = noiseReading.meanDecibel;
 
     if (volume > blowThreshold && !isBlowing) {
@@ -102,12 +105,40 @@ class _ExtincteurTimerGamePageState extends State<ExtincteurTimerGamePage> {
   }
 
   void stopTimer() {
-    isBlowing = false;
+    setState(() {
+      isBlowing = false;
+      hasFinished = true; // On marque qu'on a fini
+    });
     timer?.cancel();
+  }
+
+  void resetTimer() {
+    setState(() {
+      currentTime = 0;
+      isBlowing = false;
+      hasFinished = false;
+    });
   }
 
   String formatTime(double time) {
     return time.toStringAsFixed(1);
+  }
+
+  String getMessageBasedOnTime() {
+    if (!hasFinished) {
+      return isBlowing ? "SOUFFLE 🔥" : "Souffle pour démarrer";
+    }
+
+    // Messages selon le temps
+    if (currentTime < 5) {
+      return "Trop court vous avez fini carbonisez 🔥";
+    } else if (currentTime >= 5 && currentTime < 15) {
+      return "De justesse ! vous etes brulé a certain endroit 🔥";
+    } else if (currentTime >= 15 && currentTime < 30) {
+      return "Bien joué ! le feu c'est éteint avant que quelqu'un soit blesser 🏆";
+    } else {
+      return "Excellent ! Tu es un champion ! 🏆";
+    }
   }
 
   @override
@@ -141,12 +172,39 @@ class _ExtincteurTimerGamePageState extends State<ExtincteurTimerGamePage> {
             ),
             const SizedBox(height: 20),
             Text(
-              isBlowing ? "SOUFFLE 🔥" : "Souffle pour démarrer",
+              getMessageBasedOnTime(),
               style: TextStyle(
                 color: isBlowing ? Colors.orange : Colors.white54,
                 fontSize: 18,
               ),
+              textAlign: TextAlign.center,
             ),
+
+            // Bouton de reset qui apparaît quand on a fini
+            if (hasFinished) ...[
+              const SizedBox(height: 40),
+              ElevatedButton(
+                onPressed: resetTimer,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF63CCE9),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text(
+                  "RECOMMENCER",
+                  style: TextStyle(
+                    color: Color(0xFF1D132E),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),

@@ -60,7 +60,12 @@ class TireCowboyPage extends StatelessWidget {
 
               const SizedBox(height: 40),
 
-              _buildStartButton(context),
+              // BOUTON SOLO
+              _buildStartButton(context, 'SOLO', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const TireCowboyGamePage()));
+              }),
+
+              const SizedBox(height: 15),
 
               const SizedBox(height: 40),
 
@@ -120,13 +125,13 @@ class TireCowboyPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStartButton(BuildContext context) {
+  Widget _buildStartButton(BuildContext context, String label, VoidCallback onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50),
       child: SizedBox(
         width: double.infinity,
         child: OutlinedButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TireCowboyGamePage())),
+          onPressed: onPressed,
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFF49A24), width: 1.5),
             backgroundColor: Colors.black.withValues(alpha: 0.2),
@@ -134,7 +139,7 @@ class TireCowboyPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12),
             minimumSize: const Size(double.infinity, 50),
           ),
-          child: const Text('DEMARRER !', style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Color(0xFFF49A24))),
+          child: Text(label, style: const TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Color(0xFFF49A24))),
         ),
       ),
     );

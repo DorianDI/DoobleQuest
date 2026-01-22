@@ -7,14 +7,7 @@ import 'game/flashmcclou/accueil.dart';
 import 'game/rockybalbobo/accueil.dart';
 import 'game/squatminer/accueil.dart';
 
-void main() {
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.dark,
-    ),
-  );
+void main() async {
   runApp(const MyApp());
 }
 
