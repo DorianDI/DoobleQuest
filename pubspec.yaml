@@ -55,9 +55,12 @@ flutter:
     - assets/img/game/explosion.png
     - assets/sfx/explosion.mp3
     - assets/sfx/tick.mp3
+    - assets/sfx/coin.mp3
     - assets/img/game/cowboy_bg.png
     - assets/img/game/cowboy_gun.png
     - assets/img/game/feu.png
     - assets/img/game/vent.png
+    - assets/img/game/gemme.png
+    - assets/img/game/fond_mine.png
 
   uses-material-design: true
