@@ -41,19 +41,25 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
     _accelSub = userAccelerometerEventStream().listen((UserAccelerometerEvent event) {
       if (!mounted) return;
 
-      setState(() {
-        // 1. Détection de la descente (Axe Y)
-        if (!_isDown && event.y < _downThreshold) {
-          _isDown = true;
-          HapticFeedback.selectionClick();
-        }
+      // Calcul de la force totale (Magnitude)
+      // sqrt(x² + y² + z²)
+      double totalForce = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
 
-        // 2. Validation à la remontée
-        if (_isDown && event.y > _upThreshold) {
+      setState(() {
+        _debugValue = "Force: ${totalForce.toStringAsFixed(2)}";
+
+        // Si la force dépasse 3.0, on considère qu'il y a un mouvement de squat
+        // On utilise un petit timer pour éviter de compter 10 gemmes d'un coup
+        if (!_isDown && totalForce > 3.5) {
+          _isDown = true;
           _gemCount++;
-          _isDown = false;
           _playCoinSound();
           HapticFeedback.heavyImpact();
+
+          // On reset après 1.5 seconde pour laisser le temps de finir le squat
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            setState(() => _isDown = false);
+          });
         }
       });
     });
