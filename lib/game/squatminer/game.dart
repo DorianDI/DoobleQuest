@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math'; // FIX: Pour utiliser sqrt()
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/services.dart';
@@ -14,12 +15,13 @@ class SquatMinerGamePage extends StatefulWidget {
 class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   int _gemCount = 0;
   bool _isDown = false;
+  String _debugValue = "Bouge le téléphone..."; // FIX: Déclaration de la variable
   StreamSubscription? _accelSub;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // --- RÉGLAGES (Sensibilité) ---
-  static const double _downThreshold = -1.0; // Seuil de descente
-  static const double _upThreshold = 1.5;    // Seuil de remontée
+  // On utilise une détection de force brute (Magnitude) pour que ça marche
+  // peu importe comment tu tiens le téléphone.
+  static const double _forceThreshold = 3.5;
 
   @override
   void initState() {
@@ -27,7 +29,6 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
     _startMovementDetection();
   }
 
-  // --- LOGIQUE SONORE ---
   Future<void> _playCoinSound() async {
     try {
       await _audioPlayer.play(AssetSource('sfx/coin.mp3'));
@@ -36,29 +37,26 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
     }
   }
 
-  // --- LOGIQUE DE MOUVEMENT ---
   void _startMovementDetection() {
     _accelSub = userAccelerometerEventStream().listen((UserAccelerometerEvent event) {
       if (!mounted) return;
 
       // Calcul de la force totale (Magnitude)
-      // sqrt(x² + y² + z²)
       double totalForce = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
 
       setState(() {
-        _debugValue = "Force: ${totalForce.toStringAsFixed(2)}";
+        _debugValue = "Force : ${totalForce.toStringAsFixed(2)}";
 
-        // Si la force dépasse 3.0, on considère qu'il y a un mouvement de squat
-        // On utilise un petit timer pour éviter de compter 10 gemmes d'un coup
-        if (!_isDown && totalForce > 3.5) {
+        // Détection du squat par accélération brusque
+        if (!_isDown && totalForce > _forceThreshold) {
           _isDown = true;
           _gemCount++;
           _playCoinSound();
           HapticFeedback.heavyImpact();
 
-          // On reset après 1.5 seconde pour laisser le temps de finir le squat
-          Future.delayed(const Duration(milliseconds: 1500), () {
-            setState(() => _isDown = false);
+          // On bloque la détection pendant 1.2s pour simuler le temps du squat
+          Future.delayed(const Duration(milliseconds: 1200), () {
+            if (mounted) setState(() => _isDown = false);
           });
         }
       });
@@ -76,80 +74,39 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1D132E),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFFF49A24)),
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutBack,
-              padding: EdgeInsets.all(_isDown ? 15 : 0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  if (_isDown)
-                    BoxShadow(
-                      color: const Color(0xFF63CCE9).withValues(alpha:0.7),
-                      blurRadius: 50,
-                      spreadRadius: 10,
-                    )
-                ],
-              ),
-              child: Image.asset(
-                'assets/img/game/gemme.png',
-                width: 150,
-                fit: BoxFit.contain,
-              ),
-            ),
+            // Debug text pour voir si les capteurs bougent
+            Text(_debugValue, style: const TextStyle(color: Colors.white54, fontSize: 14)),
 
-            const SizedBox(height: 50),
-
-            const Text(
-              'GEMMES :',
-              style: TextStyle(fontFamily: 'Bangers', fontSize: 30, color: Color(0xFF7C8ED0)),
-            ),
-            Text(
-              '$_gemCount',
-              style: const TextStyle(fontFamily: 'Bangers', fontSize: 80, color: Colors.white),
-            ),
-
-            const SizedBox(height: 50),
+            const SizedBox(height: 20),
 
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-              decoration: BoxDecoration(
-                color: _isDown ? const Color(0xFF63CCE9) : Colors.transparent,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                    color: _isDown ? Colors.transparent : const Color(0xFFF49A24).withValues(alpha: 0.5),
-                    width: 2
-                ),
-              ),
-              child: Text(
-                _isDown ? "REMONTE !" : "DESCENDS !",
-                style: TextStyle(
-                  fontFamily: 'Bangers',
-                  fontSize: 28,
-                  color: _isDown ? const Color(0xFF1D132E) : const Color(0xFFF49A24),
-                ),
-              ),
+              padding: EdgeInsets.all(_isDown ? 20 : 0),
+              child: Image.asset('assets/img/game/gemme.png', width: 150),
+            ),
+
+            const SizedBox(height: 40),
+
+            const Text('GEMMES', style: TextStyle(fontFamily: 'Bangers', fontSize: 30, color: Color(0xFF7C8ED0))),
+            Text('$_gemCount', style: const TextStyle(fontFamily: 'Bangers', fontSize: 80, color: Colors.white)),
+
+            const SizedBox(height: 40),
+
+            Text(
+              _isDown ? "BIEN JOUÉ !" : "SQUAT !",
+              style: TextStyle(fontFamily: 'Bangers', fontSize: 28, color: _isDown ? Colors.greenAccent : const Color(0xFFF49A24)),
             ),
 
             const SizedBox(height: 60),
 
-            // --- BOUTON RETOUR ---
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'ARRÊTER LA MINE',
-                style: TextStyle(fontFamily: 'Bangers', color: Color(0xFF7C8ED0), fontSize: 20),
-              ),
+              child: const Text('RETOUR', style: TextStyle(fontFamily: 'Bangers', color: Colors.white54, fontSize: 20)),
             ),
           ],
         ),
