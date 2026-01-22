@@ -102,7 +102,7 @@ class SquatMinerPage extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFF49A24).withOpacity(0.3),
+                          color: const Color(0xFFF49A24).withValues(alpha : 0.3),
                           blurRadius: 60,
                         ),
                       ],
@@ -138,7 +138,7 @@ class SquatMinerPage extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Color(0xFFF49A24), width: 1.5),
-                      backgroundColor: Colors.black.withOpacity(0.2),
+                      backgroundColor: Colors.black.withValues(alpha: 0.2),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
@@ -159,8 +159,8 @@ class SquatMinerPage extends StatelessWidget {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: const Color(0xFFF49A24).withOpacity(0.5)),
-                    color: Colors.black.withOpacity(0.1),
+                    border: Border.all(color: const Color(0xFFF49A24).withValues( alpha : 0.5)),
+                    color: Colors.black.withValues( alpha : 0.1),
                   ),
                   child: const Column(
                     children: [

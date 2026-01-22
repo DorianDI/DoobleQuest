@@ -18,8 +18,8 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   // --- RÉGLAGES (Sensibilité) ---
-  static const double _downThreshold = -3.0; // Seuil de descente
-  static const double _upThreshold = 2.5;    // Seuil de remontée
+  static const double _downThreshold = -1.0; // Seuil de descente
+  static const double _upThreshold = 1.5;    // Seuil de remontée
 
   @override
   void initState() {
@@ -88,7 +88,7 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
                 boxShadow: [
                   if (_isDown)
                     BoxShadow(
-                      color: const Color(0xFF63CCE9).withOpacity(0.7),
+                      color: const Color(0xFF63CCE9).withValues(alpha:0.7),
                       blurRadius: 50,
                       spreadRadius: 10,
                     )
@@ -121,7 +121,7 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
                 color: _isDown ? const Color(0xFF63CCE9) : Colors.transparent,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
-                    color: _isDown ? Colors.transparent : const Color(0xFFF49A24).withOpacity(0.5),
+                    color: _isDown ? Colors.transparent : const Color(0xFFF49A24).withValues(alpha: 0.5),
                     width: 2
                 ),
               ),
