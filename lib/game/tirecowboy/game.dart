@@ -51,8 +51,11 @@ class _TireCowboyGamePageState extends State<TireCowboyGamePage> {
         });
         Future.wait([
           HapticFeedback.heavyImpact(),
+          Future.delayed(const Duration(milliseconds: 50), () => HapticFeedback.heavyImpact()),
           Future.delayed(const Duration(milliseconds: 100), () => HapticFeedback.heavyImpact()),
+          Future.delayed(const Duration(milliseconds: 150), () => HapticFeedback.heavyImpact()),
           Future.delayed(const Duration(milliseconds: 200), () => HapticFeedback.heavyImpact()),
+          Future.delayed(const Duration(milliseconds: 250), () => HapticFeedback.heavyImpact()),
         ]);
       }
     });
