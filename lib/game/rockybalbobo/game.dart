@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 
 class RockyCameraView extends StatefulWidget {
   const RockyCameraView({super.key});
@@ -19,9 +17,11 @@ class _RockyCameraViewState extends State<RockyCameraView> {
   bool _isProcessing = false;
   int _score = 0;
   bool _isExtended = false;
-  String _debugDistance = "Initialisation... ";
+  // Message de départ
+  String _debugDistance = "Démarrage caméra...";
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  // On utilise le mode 'stream' pour la rapidité
   final PoseDetector _poseDetector = PoseDetector(
       options: PoseDetectorOptions(mode: PoseDetectionMode.stream)
   );
@@ -30,111 +30,116 @@ class _RockyCameraViewState extends State<RockyCameraView> {
   void initState() {
     super.initState();
     _initializeCamera();
+    // Pré-chargement du son
+    _audioPlayer.setSource(AssetSource('sfx/punch.mp3'));
   }
 
   Future<void> _initializeCamera() async {
     try {
       final cameras = await availableCameras();
-
-      // Sécurité pour simulateur : vérifie si une caméra existe
-      if (cameras.isEmpty) {
-        if (mounted) setState(() => _debugDistance = "Pas de caméra (simulateur)");
-        return;
-      }
-
-      // Tente de trouver la caméra frontale, sinon prend la première
-      final camera = cameras.any((c) => c.lensDirection == CameraLensDirection.front)
-          ? cameras.firstWhere((c) => c.lensDirection == CameraLensDirection.front)
-          : cameras.first;
+      // Recherche de la caméra frontale
+      final frontCamera = cameras.firstWhere(
+            (c) => c.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
+      );
 
       _controller = CameraController(
-        camera,
-        ResolutionPreset.medium,
+        frontCamera,
+        ResolutionPreset.medium, // Medium suffit pour l'IA et est plus rapide
         enableAudio: false,
-        imageFormatGroup: Platform.isAndroid ? ImageFormatGroup.yuv420 : ImageFormatGroup.bgra8888,
+        imageFormatGroup: ImageFormatGroup.yuv420, // Format standard Android
       );
 
       await _controller?.initialize();
 
-      if (mounted) setState(() => _debugDistance = "IA active");
+      if (mounted) setState(() => _debugDistance = "Caméra OK. Lancement IA...");
 
+      // Démarrage du flux d'images vers l'IA
       _controller?.startImageStream((CameraImage image) async {
         if (_isProcessing) return;
         _isProcessing = true;
 
         try {
+          // Conversion de l'image pour ML Kit
           final inputImage = _inputImageFromCameraImage(image);
+
           if (inputImage != null) {
             final poses = await _poseDetector.processImage(inputImage);
+
+            // --- DIAGNOSTIC IA ---
             if (poses.isNotEmpty) {
+              // Si on est ici, c'est GAGNÉ : l'IA te voit !
               _detectPunch(poses.first);
+            } else {
+              // Si ce message s'affiche alors que tu es devant, c'est un problème de rotation.
+              if (mounted) setState(() => _debugDistance = "Je ne vois personne (Mauvaise rotation ?)");
             }
           }
         } catch (e) {
-          debugPrint("Erreur stream : $e");
+          debugPrint("Erreur IA : $e");
         }
         _isProcessing = false;
       });
     } catch (e) {
-      if (mounted) setState(() => _debugDistance = "Erreur Camera : $e");
+      if (mounted) setState(() => _debugDistance = "Erreur Caméra : Vérifier permissions");
     }
     if (mounted) setState(() {});
   }
 
+  // Fonction qui analyse le squelette détecté
   void _detectPunch(Pose pose) {
     final rShoulder = pose.landmarks[PoseLandmarkType.rightShoulder];
     final rWrist = pose.landmarks[PoseLandmarkType.rightWrist];
 
-    if (rShoulder != null && rWrist != null) {
-      // Calcul de la distance $d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$
+    // On vérifie si l'épaule et le poignet droits sont visibles avec une bonne confiance
+    if (rShoulder != null && rWrist != null && rShoulder.likelihood > 0.5 && rWrist.likelihood > 0.5) {
+
+      // Calcul de la distance euclidienne (Pythagore)
       final double distance = sqrt(pow(rWrist.x - rShoulder.x, 2) + pow(rWrist.y - rShoulder.y, 2));
 
-      // Seuil de déclenchement (ajustable)
-      const double punchThreshold = 180.0;
+      // Affichage en direct de la distance pour le debug
+      if (mounted) setState(() => _debugDistance = "Distance bras : ${distance.toStringAsFixed(0)} px");
 
+      // Seuil de détection du coup de poing (ajuster si besoin)
+      const double punchThreshold = 160.0;
+
+      // Logique du coup de poing (Extension puis rétraction)
       if (!_isExtended && distance > punchThreshold) {
-        if (mounted) {
-          setState(() {
-            _score++;
-            _isExtended = true;
-            _debugDistance = "PUNCH !";
-          });
-        }
+        setState(() {
+          _score++;
+          _isExtended = true;
+        });
         _playPunchSound();
-        HapticFeedback.lightImpact();
-      } else if (_isExtended && distance < punchThreshold * 0.6) {
+        HapticFeedback.lightImpact(); // Petite vibration
+      } else if (distance < punchThreshold * 0.7) {
+        // On considère le bras rétracté s'il redescend sous 70% du seuil
         if (mounted) setState(() => _isExtended = false);
       }
     }
   }
 
+  // --- C'EST ICI QUE LA CORRECTION PRINCIPALE SE TROUVE ---
   InputImage? _inputImageFromCameraImage(CameraImage image) {
-    // Reconstruction propre des bytes pour ML Kit
-    final WriteBuffer allBytes = WriteBuffer();
-    for (final Plane plane in image.planes) {
-      allBytes.putUint8List(plane.bytes);
-    }
-    final bytes = allBytes.done().buffer.asUint8List();
+    final format = InputImageFormatValue.fromRawValue(image.format.raw);
+    if (format == null) return null;
+    final plane = image.planes.first;
 
-    final imageRotation = InputImageRotation.rotation270deg;
-    final inputImageFormat = InputImageFormatValue.fromRawValue(image.format.raw) ?? InputImageFormat.yuv420;
-
-    final inputImageMetadata = InputImageMetadata(
-      size: Size(image.width.toDouble(), image.height.toDouble()),
-      rotation: imageRotation,
-      format: inputImageFormat,
-      bytesPerRow: image.planes[0].bytesPerRow,
+    return InputImage.fromBytes(
+      bytes: plane.bytes,
+      metadata: InputImageMetadata(
+        size: Size(image.width.toDouble(), image.height.toDouble()),
+        // FIX ROTATION ANDROID PORTRAIT :
+        // On force la rotation à 270 degrés. C'est le standard pour la caméra avant.
+        rotation: InputImageRotation.rotation270deg,
+        format: format,
+        bytesPerRow: plane.bytesPerRow,
+      ),
     );
-
-    return InputImage.fromBytes(bytes: bytes, metadata: inputImageMetadata);
   }
 
   Future<void> _playPunchSound() async {
-    try {
-      await _audioPlayer.stop(); // Reset pour pouvoir rejouer vite
-      await _audioPlayer.play(AssetSource('sfx/coup_de_poing.mp3'));
-    } catch (e) {
-      debugPrint("Erreur son : $e");
+    try { await _audioPlayer.resume(); } catch (e) {
+      try { await _audioPlayer.play(AssetSource('sfx/punch.mp3')); } catch(e2) {}
     }
   }
 
@@ -149,71 +154,53 @@ class _RockyCameraViewState extends State<RockyCameraView> {
 
   @override
   Widget build(BuildContext context) {
-    // Écran de chargement ou erreur
+    // Si la caméra n'est pas prête, on affiche le message de debug au centre noir
     if (_controller == null || !_controller!.value.isInitialized) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            _debugDistance,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        ),
-      );
+      return Scaffold(backgroundColor: Colors.black, body: Center(child: Text(_debugDistance, style: const TextStyle(color: Colors.white))));
     }
 
-    // Calcul du scale pour éviter l'étirement
+    // --- FIX AFFICHAGE ANDROID (Pour garder ton image non déformée) ---
     final size = MediaQuery.of(context).size;
+    // On calcule le ratio nécessaire pour remplir l'écran sans déformer
     var scale = size.aspectRatio * _controller!.value.aspectRatio;
+    // Si l'image est moins large que l'écran, on inverse l'échelle pour zoomer
     if (scale < 1) scale = 1 / scale;
 
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Preview de la caméra
+          // 1. La Caméra (Mise à l'échelle pour remplir l'écran)
           Transform.scale(
             scale: scale,
-            child: Center(child: CameraPreview(_controller!)),
+            child: Center(
+              child: CameraPreview(_controller!),
+            ),
           ),
 
-          // Overlay UI
+          // 2. Overlay d'interface sombre pour faire ressortir les textes
+          Container(color: Colors.black.withOpacity(0.2)),
+
+          // 3. Texte de Debug en haut à gauche (ESSENTIEL POUR TESTER)
           Positioned(
-            top: 50,
-            left: 20,
+            top: 50, left: 20,
             child: Container(
               padding: const EdgeInsets.all(8),
-              color: Colors.black54,
-              child: Text(
-                _debugDistance,
-                style: const TextStyle(color: Colors.greenAccent, fontSize: 16),
-              ),
+              decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+              child: Text(_debugDistance, style: const TextStyle(color: Colors.greenAccent, fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ),
 
-          // Score central
+          // 4. Le Score au centre
           Center(
-            child: Text(
-              '$_score',
-              style: const TextStyle(
-                fontSize: 150,
-                color: Colors.white,
-                fontWeight: FontWeight.w900, // Correction apportée ici
-                shadows: [Shadow(blurRadius: 15, color: Colors.black54)],
-              ),
-            ),
+            child: Text('$_score', style: const TextStyle(fontFamily: 'Bangers', fontSize: 150, color: Colors.white, shadows: [Shadow(blurRadius: 20, color: Colors.black)])),
           ),
 
-          // Bouton quitter
+          // 5. Bouton pour quitter
           Positioned(
-            bottom: 40,
-            right: 25,
-            child: FloatingActionButton(
-              backgroundColor: Colors.white24,
-              onPressed: () => Navigator.pop(context),
-              child: const Icon(Icons.close, color: Colors.white, size: 30),
-            ),
-          ),
+            top: 40, right: 20,
+            child: IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 40), onPressed: () => Navigator.pop(context)),
+          )
         ],
       ),
     );

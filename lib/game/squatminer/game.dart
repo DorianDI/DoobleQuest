@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math'; // Pour sqrt()
+import 'dart:math'; // FIX: Nécessaire pour la fonction sqrt()
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/services.dart';
@@ -14,13 +14,14 @@ class SquatMinerGamePage extends StatefulWidget {
 
 class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   int _gemCount = 0;
-  bool _isDescending = false;
-  String _debugValue = "En attente...";
+  bool _isDown = false;
+  String _debugValue = ""; // FIX: Déclaration de la variable manquante
   StreamSubscription? _accelSub;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  static const double _downThreshold = -2.2;
-  static const double _upThreshold = 2.2;
+  // Couleurs de la maquette
+  final Color _neonGreen = const Color(0xFF39FF14);
+  final Color _darkBg = const Color(0xFF1D132E);
 
   @override
   void initState() {
@@ -39,19 +40,25 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   void _startMovementDetection() {
     _accelSub = userAccelerometerEventStream().listen((UserAccelerometerEvent event) {
       if (!mounted) return;
+
+      // Calcul de la force totale (Magnitude)
+      // $totalForce = \sqrt{x^2 + y^2 + z^2}$
+      double totalForce = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
+
       setState(() {
-        _debugValue = "Y: ${event.y.toStringAsFixed(2)}";
+        _debugValue = "Force: ${totalForce.toStringAsFixed(2)}";
 
-        if (!_isDescending && event.y < _downThreshold) {
-          _isDescending = true;
-          HapticFeedback.selectionClick();
-        }
-
-        if (_isDescending && event.y > _upThreshold) {
+        // Détection du mouvement de squat
+        if (!_isDown && totalForce > 3.5) {
+          _isDown = true;
           _gemCount++;
-          _isDescending = false;
           _playCoinSound();
           HapticFeedback.heavyImpact();
+
+          // Reset automatique après le mouvement
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            if (mounted) setState(() => _isDown = false);
+          });
         }
       });
     });
@@ -67,33 +74,106 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1D132E),
-      body: Center(
+      backgroundColor: _darkBg,
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(_debugValue, style: const TextStyle(color: Colors.white24)),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
+            // Debug info
+            Text(_debugValue, style: const TextStyle(color: Colors.white24, fontSize: 12)),
+
+            // TITRE
+            Text(
+              'SQUAT MINER (스쿼트 마이너)',
+              style: TextStyle(
+                fontFamily: 'Bangers',
+                fontSize: 48,
+                color: _neonGreen,
+              ),
+            ),
+
+            const SizedBox(height: 40),
+
+            // VISUEL CENTRAL (Mine + Gemme)
             Stack(
               alignment: Alignment.center,
               children: [
-                ClipOval(
-                  child: Image.asset('assets/img/game/fond_mine.png', width: 260, height: 260, fit: BoxFit.cover),
+                // Cercle de fond (Mine)
+                Container(
+                  width: 300,
+                  height: 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: _neonGreen.withValues(alpha : 0.3), blurRadius: 40, spreadRadius: 5)
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/img/game/fond_mine.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                AnimatedContainer(
+                // Gemme animée
+                AnimatedScale(
+                  scale: _isDown ? 1.2 : 1.0,
                   duration: const Duration(milliseconds: 200),
-                  padding: EdgeInsets.all(_isDescending ? 40 : 0),
-                  child: Image.asset('assets/img/game/gemme.png', width: 180),
+                  child: Image.asset(
+                    'assets/img/game/gemme.png',
+                    width: 200,
+                  ),
                 ),
               ],
             ),
+
             const SizedBox(height: 40),
-            Text('$_gemCount', style: const TextStyle(fontFamily: 'Bangers', fontSize: 90, color: Colors.white)),
-            Text(_isDescending ? "REMONTE !" : "DESCENDS !",
-                style: const TextStyle(fontFamily: 'Bangers', fontSize: 32, color: Color(0xFFF49A24))),
+
+            // SCORE
+            const Text(
+              'GEMMES (보석) :',
+              style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Colors.white70),
+            ),
+            Text(
+              '$_gemCount',
+              style: const TextStyle(fontFamily: 'Bangers', fontSize: 80, color: Colors.white),
+            ),
+
+            const Spacer(),
+
+            // INDICATION DYNAMIQUE
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              decoration: BoxDecoration(
+                color: _isDown ? _neonGreen : Colors.transparent,
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: _neonGreen, width: 2),
+              ),
+              child: Text(
+                _isDown ? "REMONTE ! (올라오세요!)" : "DESCENDS ! (내려가세요!)",
+                style: TextStyle(
+                  fontFamily: 'Bangers',
+                  fontSize: 28,
+                  color: _isDown ? _darkBg : _neonGreen,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            // BOUTON QUITTER
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'ARRÊTER LA MINE (광산 중지)',
+                style: TextStyle(fontFamily: 'Bangers', color: Colors.white38, fontSize: 18),
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-}
+} // FIX: Accolade fermante ajoutée ici
