@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:math'; // FIX: Nécessaire pour la fonction sqrt()
+import 'dart:math'; // Pour la fonction sqrt
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/services.dart';
@@ -15,11 +15,10 @@ class SquatMinerGamePage extends StatefulWidget {
 class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   int _gemCount = 0;
   bool _isDown = false;
-  String _debugValue = ""; // FIX: Déclaration de la variable manquante
+  String _debugValue = "";
   StreamSubscription? _accelSub;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // Couleurs de la maquette
   final Color _neonGreen = const Color(0xFF39FF14);
   final Color _darkBg = const Color(0xFF1D132E);
 
@@ -41,21 +40,19 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
     _accelSub = userAccelerometerEventStream().listen((UserAccelerometerEvent event) {
       if (!mounted) return;
 
-      // Calcul de la force totale (Magnitude)
-      // $totalForce = \sqrt{x^2 + y^2 + z^2}$
+      // Calcul de la force via la magnitude
+      // $$totalForce = \sqrt{x^2 + y^2 + z^2}$$
       double totalForce = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
 
       setState(() {
         _debugValue = "Force: ${totalForce.toStringAsFixed(2)}";
 
-        // Détection du mouvement de squat
         if (!_isDown && totalForce > 3.5) {
           _isDown = true;
           _gemCount++;
           _playCoinSound();
           HapticFeedback.heavyImpact();
 
-          // Reset automatique après le mouvement
           Future.delayed(const Duration(milliseconds: 1500), () {
             if (mounted) setState(() => _isDown = false);
           });
@@ -79,12 +76,10 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            // Debug info
             Text(_debugValue, style: const TextStyle(color: Colors.white24, fontSize: 12)),
 
-            // TITRE
             Text(
-              'SQUAT MINER (스쿼트 마이너)',
+              'SQUAT MINER',
               style: TextStyle(
                 fontFamily: 'Bangers',
                 fontSize: 48,
@@ -94,18 +89,16 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
 
             const SizedBox(height: 40),
 
-            // VISUEL CENTRAL (Mine + Gemme)
             Stack(
               alignment: Alignment.center,
               children: [
-                // Cercle de fond (Mine)
                 Container(
                   width: 300,
                   height: 300,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: _neonGreen.withValues(alpha : 0.3), blurRadius: 40, spreadRadius: 5)
+                      BoxShadow(color: _neonGreen.withOpacity(0.3), blurRadius: 40, spreadRadius: 5)
                     ],
                   ),
                   child: ClipOval(
@@ -115,7 +108,6 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
                     ),
                   ),
                 ),
-                // Gemme animée
                 AnimatedScale(
                   scale: _isDown ? 1.2 : 1.0,
                   duration: const Duration(milliseconds: 200),
@@ -129,9 +121,8 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
 
             const SizedBox(height: 40),
 
-            // SCORE
             const Text(
-              'GEMMES (보석) :',
+              'GEMMES :',
               style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Colors.white70),
             ),
             Text(
@@ -141,7 +132,6 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
 
             const Spacer(),
 
-            // INDICATION DYNAMIQUE
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
@@ -151,7 +141,7 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
                 border: Border.all(color: _neonGreen, width: 2),
               ),
               child: Text(
-                _isDown ? "REMONTE ! (올라오세요!)" : "DESCENDS ! (내려가세요!)",
+                _isDown ? "REMONTE !" : "DESCENDS !",
                 style: TextStyle(
                   fontFamily: 'Bangers',
                   fontSize: 28,
@@ -162,11 +152,10 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
 
             const SizedBox(height: 30),
 
-            // BOUTON QUITTER
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text(
-                'ARRÊTER LA MINE (광산 중지)',
+                'ARRÊTER LA MINE',
                 style: TextStyle(fontFamily: 'Bangers', color: Colors.white38, fontSize: 18),
               ),
             ),
@@ -176,4 +165,4 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
       ),
     );
   }
-} // FIX: Accolade fermante ajoutée ici
+}
