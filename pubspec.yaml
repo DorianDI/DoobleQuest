@@ -15,6 +15,7 @@ dependencies:
   nearby_connections: ^4.3.0
   web_socket_channel: ^2.4.0
   intl: ^0.20.2
+  socket_io_client: ^2.0.3+1
   flutter:
     sdk: flutter
 

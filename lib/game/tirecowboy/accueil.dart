@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'game.dart';
+import 'multiplayer_menu.dart';
 
 class TireCowboyPage extends StatelessWidget {
   const TireCowboyPage({super.key});
@@ -66,6 +67,11 @@ class TireCowboyPage extends StatelessWidget {
               }),
 
               const SizedBox(height: 15),
+
+              // BOUTON MULTIJOUEUR
+              _buildStartButton(context, 'MULTIJOUEUR', () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const MultiplayerMenuPage()));
+              }),
 
               const SizedBox(height: 40),
 
