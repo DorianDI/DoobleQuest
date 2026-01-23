@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math'; // Pour la fonction sqrt
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/services.dart';
@@ -13,14 +12,17 @@ class SquatMinerGamePage extends StatefulWidget {
 }
 
 class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
+  // --- VARIABLES DE JEU ---
   int _gemCount = 0;
-  bool _isDown = false;
-  String _debugValue = "";
+  bool _isDescending = false;
+  String _debugValue = "Prêt ?";
   StreamSubscription? _accelSub;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  final Color _neonGreen = const Color(0xFF39FF14);
-  final Color _darkBg = const Color(0xFF1D132E);
+  // --- RÉGLAGES SENSIBILITÉ ASSOUPLIS ---
+  // On passe de 2.2 à 1.2 pour faciliter la détection
+  static const double _downThreshold = -1.2;
+  static const double _upThreshold = 1.2;
 
   @override
   void initState() {
@@ -40,22 +42,21 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
     _accelSub = userAccelerometerEventStream().listen((UserAccelerometerEvent event) {
       if (!mounted) return;
 
-      // Calcul de la force via la magnitude
-      // $$totalForce = \sqrt{x^2 + y^2 + z^2}$$
-      double totalForce = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
-
       setState(() {
-        _debugValue = "Force: ${totalForce.toStringAsFixed(2)}";
+        _debugValue = "Axe Y : ${event.y.toStringAsFixed(2)}";
 
-        if (!_isDown && totalForce > 3.5) {
-          _isDown = true;
+        // ÉTAPE 1 : Détecter la descente (accélération vers le bas)
+        if (!_isDescending && event.y < _downThreshold) {
+          _isDescending = true;
+          HapticFeedback.selectionClick();
+        }
+
+        // ÉTAPE 2 : Détecter la remontée (accélération vers le haut)
+        if (_isDescending && event.y > _upThreshold) {
           _gemCount++;
+          _isDescending = false;
           _playCoinSound();
           HapticFeedback.heavyImpact();
-
-          Future.delayed(const Duration(milliseconds: 1500), () {
-            if (mounted) setState(() => _isDown = false);
-          });
         }
       });
     });
@@ -71,95 +72,74 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _darkBg,
-      body: SafeArea(
+      backgroundColor: const Color(0xFF1D132E),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFFF49A24)),
+      ),
+      body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-            Text(_debugValue, style: const TextStyle(color: Colors.white24, fontSize: 12)),
-
-            Text(
-              'SQUAT MINER',
-              style: TextStyle(
-                fontFamily: 'Bangers',
-                fontSize: 48,
-                color: _neonGreen,
+            Text(_debugValue, style: const TextStyle(color: Colors.white24, fontSize: 14)),
+            const SizedBox(height: 30),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              padding: EdgeInsets.all(_isDescending ? 35 : 0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  if (_isDescending)
+                    BoxShadow(
+                      color: const Color(0xFF63CCE9).withValues(alpha:0.5),
+                      blurRadius: 40,
+                      spreadRadius: 5,
+                    )
+                ],
+              ),
+              child: Image.asset(
+                'assets/img/game/gemme.png',
+                width: 160,
+                fit: BoxFit.contain,
               ),
             ),
-
-            const SizedBox(height: 40),
-
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: _neonGreen.withOpacity(0.3), blurRadius: 40, spreadRadius: 5)
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/img/game/fond_mine.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                AnimatedScale(
-                  scale: _isDown ? 1.2 : 1.0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Image.asset(
-                    'assets/img/game/gemme.png',
-                    width: 200,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 40),
-
+            const SizedBox(height: 50),
             const Text(
-              'GEMMES :',
-              style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Colors.white70),
+              'GEMMES RÉCOLTÉES',
+              style: TextStyle(fontFamily: 'Bangers', fontSize: 24, color: Color(0xFF7C8ED0)),
             ),
             Text(
               '$_gemCount',
-              style: const TextStyle(fontFamily: 'Bangers', fontSize: 80, color: Colors.white),
+              style: const TextStyle(fontFamily: 'Bangers', fontSize: 90, color: Colors.white),
             ),
-
-            const Spacer(),
-
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            const SizedBox(height: 40),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
               decoration: BoxDecoration(
-                color: _isDown ? _neonGreen : Colors.transparent,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: _neonGreen, width: 2),
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(color: _isDescending ? const Color(0xFF63CCE9) : Colors.white10),
+                color: _isDescending ? const Color(0xFF63CCE9).withValues(alpha:0.1) : Colors.transparent,
               ),
               child: Text(
-                _isDown ? "REMONTE !" : "DESCENDS !",
+                _isDescending ? "REMONTE ! ⬆️" : "DESCENDS ! ⬇️",
                 style: TextStyle(
                   fontFamily: 'Bangers',
                   fontSize: 28,
-                  color: _isDown ? _darkBg : _neonGreen,
+                  color: _isDescending ? const Color(0xFF63CCE9) : const Color(0xFFF49A24),
                 ),
               ),
             ),
-
-            const SizedBox(height: 30),
-
+            const Spacer(),
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text(
-                'ARRÊTER LA MINE',
+                'QUITTER LA MINE',
                 style: TextStyle(fontFamily: 'Bangers', color: Colors.white38, fontSize: 18),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
           ],
         ),
       ),
