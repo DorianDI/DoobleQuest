@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'medecin_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -52,10 +53,16 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
 
-      // Attendre un peu puis retourner à l'accueil
+      // Attendre un peu puis naviguer vers la page médecin
       await Future.delayed(const Duration(milliseconds: 500));
       if (!mounted) return;
-      Navigator.pop(context, true); // Retour avec succès
+
+      // Navigation vers la page médecin avec remplacement
+      // On utilise pushReplacement pour éviter de revenir au login avec le bouton retour
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MedecinPage()),
+      );
     } else {
       // Erreur de connexion
       ScaffoldMessenger.of(context).showSnackBar(

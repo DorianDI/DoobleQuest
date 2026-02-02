@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'patients_list_page.dart';
+import 'statistiques_page.dart';
 
 class MedecinPage extends StatefulWidget {
   const MedecinPage({super.key});
@@ -68,7 +70,8 @@ class _MedecinPageState extends State<MedecinPage> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context, true); // Retourne à l'accueil avec refresh
+        // Retourner à l'accueil en supprimant toute la pile de navigation
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     }
   }
@@ -82,7 +85,10 @@ class _MedecinPageState extends State<MedecinPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFFF49A24)),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Retour à l'accueil en supprimant toute la pile
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },
         ),
       ),
       body: SingleChildScrollView(
@@ -216,11 +222,12 @@ class _MedecinPageState extends State<MedecinPage> {
               _buildFeatureCard(
                 icon: Icons.bar_chart,
                 title: 'Statistiques',
-                description: 'Voir les statistiques des patients',
+                description: 'Vue d\'ensemble de tous vos patients',
                 onTap: () {
-                  // TODO: Navigation vers la page de statistiques
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Statistiques - À venir')),
+                  // Navigation vers les statistiques
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const StatistiquesPage()),
                   );
                 },
               ),
@@ -230,33 +237,10 @@ class _MedecinPageState extends State<MedecinPage> {
                 title: 'Mes Patients',
                 description: 'Gérer les patients et leurs progrès',
                 onTap: () {
-                  // TODO: Navigation vers la page des patients
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Patients - À venir')),
-                  );
-                },
-              ),
-              const SizedBox(height: 15),
-              _buildFeatureCard(
-                icon: Icons.assignment,
-                title: 'Prescriptions',
-                description: 'Prescrire des exercices aux patients',
-                onTap: () {
-                  // TODO: Navigation vers la page de prescriptions
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Prescriptions - À venir')),
-                  );
-                },
-              ),
-              const SizedBox(height: 15),
-              _buildFeatureCard(
-                icon: Icons.history,
-                title: 'Historique',
-                description: 'Consulter l\'historique des sessions',
-                onTap: () {
-                  // TODO: Navigation vers la page d'historique
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Historique - À venir')),
+                  // Navigation vers la liste des patients
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PatientsListPage()),
                   );
                 },
               ),
