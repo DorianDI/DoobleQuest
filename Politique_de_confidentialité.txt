@@ -1,0 +1,26 @@
+Politique de Confidentialité - Doodle Quest
+Dernière mise à jour : 2 février 2026
+
+L'application Doodle Quest (ci-après "l'Application") est engagée dans la protection de la vie privée de ses utilisateurs. Cette politique explique comment nous traitons vos informations.
+
+1. Collecte des Données
+Doodle Quest est conçu pour être un jeu simple et respectueux.
+
+Données personnelles : L'Application ne collecte aucune donnée personnelle permettant de vous identifier directement (nom, adresse, numéro de téléphone).
+
+Données d'utilisation : Nous pouvons collecter des données anonymes liées à l'usage du jeu (scores, temps de jeu) pour améliorer l'expérience utilisateur.
+
+2. Partage des Données
+Nous ne vendons, n'échangeons, ni ne transférons vos informations à des tiers. Aucune donnée n'est partagée avec des annonceurs externes.
+
+3. Autorisations
+L'Application peut demander certaines autorisations sur votre appareil (comme l'accès au stockage pour sauvegarder vos scores localement). Ces accès sont strictement limités au bon fonctionnement du jeu.
+
+4. Sécurité
+Nous mettons en œuvre toutes les mesures nécessaires pour garantir la sécurité des informations stockées localement sur votre appareil.
+
+5. Services Tiers
+Si l'Application utilise des services tiers (comme Google Play Games pour les classements), ces services disposent de leur propre politique de confidentialité que nous vous invitons à consulter.
+
+6. Contact
+Pour toute question concernant cette politique de confidentialité, vous pouvez nous contacter à l'adresse suivante : dorianroch292@gmail.com
