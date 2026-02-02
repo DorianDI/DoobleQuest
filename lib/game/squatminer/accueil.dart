@@ -187,7 +187,7 @@ class _SquatMinerPageState extends State<SquatMinerPage> {
               const Padding(
                 padding: EdgeInsets.only(bottom: 15, left: 15, right: 15),
                 child: Text(
-                  "Tenez le téléphone bras tendus devant vous et faites des squats! Chaque squat ramasse une gemme. Si vous ne descendez pas assez bas vous ne récolterez pas de gemme !",
+                  "Tenez le téléphone bras tendus devant vous et faites des squats! Chaque squat ramasse une gemme. Si vous ne descendez pas assez bas ou si vous ne tenez pas votre position squat/debout vous ne récolterez pas de gemme !",
                   style: TextStyle(
                       color: Colors.white70, // Texte blanc cassé pour la lisibilité
                       fontSize: 14,

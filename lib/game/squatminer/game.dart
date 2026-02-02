@@ -43,16 +43,17 @@ class _SquatMinerGamePageState extends State<SquatMinerGamePage> {
       if (!mounted) return;
 
       setState(() {
-        _debugValue = "Axe Y : ${event.y.toStringAsFixed(2)}";
+        // UTILISER L'AXE Z pour les mouvements verticaux
+        _debugValue = "Axe Z : ${event.z.toStringAsFixed(2)}";
 
-        // ÉTAPE 1 : Détecter la descente (accélération vers le bas)
-        if (!_isDescending && event.y < _downThreshold) {
+        // ÉTAPE 1 : Détecter la descente (le Z augmente quand on descend)
+        if (!_isDescending && event.z > 0.3) {  // Seuil positif augmenté
           _isDescending = true;
           HapticFeedback.selectionClick();
         }
 
-        // ÉTAPE 2 : Détecter la remontée (accélération vers le haut)
-        if (_isDescending && event.y > _upThreshold) {
+        // ÉTAPE 2 : Détecter la remontée (le Z diminue quand on remonte)
+        if (_isDescending && event.z < -0.5) {  // Seuil négatif
           _gemCount++;
           _isDescending = false;
           _playCoinSound();
