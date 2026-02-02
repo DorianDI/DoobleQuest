@@ -9,11 +9,10 @@ class FlashMcClouPage extends StatefulWidget {
 }
 
 class _FlashMcClouPageState extends State<FlashMcClouPage> {
-
   void _onPlay() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const FlashMcClouGamePage()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const FlashMcClouGamePage()));
   }
 
   @override
@@ -22,73 +21,72 @@ class _FlashMcClouPageState extends State<FlashMcClouPage> {
       backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(
-          color: Color(0xFF63CCE9),
-        ),
+        iconTheme: const IconThemeData(color: Color(0xFF63CCE9)),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Transform.translate(
-                  offset: const Offset(-8, 4),
-                  child: const Text(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Transform.translate(
+                    offset: const Offset(-8, 4),
+                    child: const Text(
+                      'FlashMcClou',
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 68,
+                        color: Color(0xFF663A00),
+                      ),
+                    ),
+                  ),
+                  const Text(
                     'FlashMcClou',
                     style: TextStyle(
                       fontFamily: 'Bangers',
                       fontSize: 68,
-                      color: Color(0xFF663A00),
+                      color: Color(0xFF63CCE9),
                     ),
                   ),
-                ),
-                const Text(
-                  'FlashMcClou',
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    color: Color(0xFF63CCE9),
-                  ),
-                ),
-              ],
-            ),
-            Transform.translate(
-              offset: const Offset(-8, 4),
-              child: RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontFamily: 'Caveat',
-                    fontSize: 36,
-                  ),
-                  children: [
-                    TextSpan(text: 'Clou le plus ',
-                        style: TextStyle(color: Color(0xFF7C8ED0))),
-                    TextSpan(text: 'vite ',
-                        style: TextStyle(color: Color(0xFF63CCE9))),
-                    TextSpan(
-                        text: '!', style: TextStyle(color: Color(0xFF7C8ED0))),
-                  ],
-                ),
+                ],
               ),
-            ),
-            SizedBox(height: 50),
-            CustomPaint(
-              size: const Size(120, 300), // taille de la zone de dessin
-              painter: NailPainter(),
-            ),
-            SizedBox(height: 50),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child: _mainMenu(),
+              Transform.translate(
+                offset: const Offset(-8, 4),
+                child: RichText(
+                  text: const TextSpan(
+                    style: TextStyle(fontFamily: 'Caveat', fontSize: 36),
+                    children: [
+                      TextSpan(
+                        text: 'Clou le plus ',
+                        style: TextStyle(color: Color(0xFF7C8ED0)),
+                      ),
+                      TextSpan(
+                        text: 'vite ',
+                        style: TextStyle(color: Color(0xFF63CCE9)),
+                      ),
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(color: Color(0xFF7C8ED0)),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 50),
+              CustomPaint(
+                size: const Size(120, 300), // taille de la zone de dessin
+                painter: NailPainter(),
+              ),
+              SizedBox(height: 50),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _mainMenu(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -98,10 +96,7 @@ class _FlashMcClouPageState extends State<FlashMcClouPage> {
     return Column(
       key: const ValueKey('mainMenu'),
       children: [
-        _bigButton(
-          label: 'DEMARRER !',
-          onTap: _onPlay,
-        ),
+        _bigButton(label: 'DEMARRER !', onTap: _onPlay),
         SizedBox(height: 20),
         Container(
           decoration: BoxDecoration(
@@ -112,7 +107,10 @@ class _FlashMcClouPageState extends State<FlashMcClouPage> {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -142,7 +140,11 @@ class _FlashMcClouPageState extends State<FlashMcClouPage> {
               ),
               const SizedBox(height: 3),
               Padding(
-                padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),  // Léger padding
+                padding: const EdgeInsets.only(
+                  bottom: 8,
+                  left: 8,
+                  right: 8,
+                ), // Léger padding
                 child: Text(
                   "Tenez le téléphone comme un marteau et frappez  dans l'air! Chaque mouvement compte comme  un coup. Le plus rapide à enfoncer le clou gagne!",
                   style: TextStyle(color: Color(0xFF63CCE9), fontSize: 14),
@@ -212,25 +214,13 @@ class NailPainter extends CustomPainter {
     // TÊTE DU CLOU
     path.addRRect(
       RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.15,
-          0,
-          size.width * 0.7,
-          headHeight,
-        ),
+        Rect.fromLTWH(size.width * 0.15, 0, size.width * 0.7, headHeight),
         const Radius.circular(8),
       ),
     );
 
     // TIGE
-    path.addRect(
-      Rect.fromLTWH(
-        shaftLeft,
-        headHeight,
-        shaftWidth,
-        shaftHeight,
-      ),
-    );
+    path.addRect(Rect.fromLTWH(shaftLeft, headHeight, shaftWidth, shaftHeight));
 
     // POINTE (✅ alignée exactement sur le bas de la tige)
     path.moveTo(shaftLeft, shaftBottom);

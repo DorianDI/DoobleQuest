@@ -19,7 +19,7 @@ class MultiplayerLobbyPage extends StatefulWidget {
 
 class _MultiplayerLobbyPageState extends State<MultiplayerLobbyPage> {
   final MultiplayerService _service = MultiplayerService();
-  
+
   String? _gameCode;
   bool _isReady = false;
   bool _opponentReady = false;
@@ -40,7 +40,7 @@ class _MultiplayerLobbyPageState extends State<MultiplayerLobbyPage> {
         _hostName = players['host']['name'];
         _guestName = players['guest']?['name'];
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${players['guest']['name']} a rejoint la partie !'),
@@ -49,7 +49,7 @@ class _MultiplayerLobbyPageState extends State<MultiplayerLobbyPage> {
       );
     };
 
-    _service.onRematchRead= (players) {
+    _service.onRematchReady = (players) {
       setState(() {
         _hostName = players['host']['name'];
         _guestName = players['guest']?['name'];
@@ -58,7 +58,8 @@ class _MultiplayerLobbyPageState extends State<MultiplayerLobbyPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Prêts pour un nouveau duel !'),
+        const SnackBar(
+          content: Text('Prêts pour un nouveau duel ? 🔥'),
           backgroundColor: Color(0xFFF49A24),
           duration: Duration(seconds: 2),
         ),
@@ -149,7 +150,7 @@ class _MultiplayerLobbyPageState extends State<MultiplayerLobbyPage> {
     _service.onGameStarting = null;
     _service.onPlayerLeft = null;
     _service.onError = null;
-    _service.onRematchRead = null;
+    _service.onRematchReady = null;
     super.dispose();
   }
 
@@ -265,7 +266,7 @@ class _MultiplayerLobbyPageState extends State<MultiplayerLobbyPage> {
                       color: _isReady ? Colors.green : const Color(0xFFF49A24),
                       width: 2,
                     ),
-                    backgroundColor: _isReady 
+                    backgroundColor: _isReady
                         ? Colors.green.withValues(alpha: 0.2)
                         : Colors.black.withValues(alpha: 0.2),
                     padding: const EdgeInsets.symmetric(vertical: 15),

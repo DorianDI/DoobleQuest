@@ -25,109 +25,104 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
       backgroundColor: const Color(0xFF1D132E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(
-          color: Color(0xFFF49A24),
-        ),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFFF49A24)),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Transform.translate(
-                  offset: const Offset(-8, 4),
-                  child: const Text(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Transform.translate(
+                    offset: const Offset(-8, 4),
+                    child: const Text(
+                      'CamilleKaze',
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 68,
+                        color: Color(0xFF663A00),
+                      ),
+                    ),
+                  ),
+                  const Text(
                     'CamilleKaze',
                     style: TextStyle(
                       fontFamily: 'Bangers',
                       fontSize: 68,
-                      color: Color(0xFF663A00),
+                      color: Color(0xFFF84C08),
                     ),
                   ),
-                ),
-                const Text(
-                  'CamilleKaze',
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    color: Color(0xFFF84C08),
-                  ),
-                ),
-              ],
-            ),
-            Transform.translate(
-              offset: const Offset(-8, 4),
-              child: RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontFamily: 'Caveat',
-                    fontSize: 36,
-                  ),
-                  children: [
-                    TextSpan(text: 'Passe la ',
-                        style: TextStyle(color: Color(0xFF7C8ED0))),
-                    TextSpan(text: 'Bombe ',
-                        style: TextStyle(color: Color(0xFFF84C08))),
-                    TextSpan(
-                        text: '!', style: TextStyle(color: Color(0xFF7C8ED0))),
-                  ],
-                ),
+                ],
               ),
-            ),
-            SizedBox(height: 50),
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.transparent,
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color(0xFFF84C08),
-                          blurRadius: 100,
-                          spreadRadius: 5
+              Transform.translate(
+                offset: const Offset(-8, 4),
+                child: RichText(
+                  text: const TextSpan(
+                    style: TextStyle(fontFamily: 'Caveat', fontSize: 36),
+                    children: [
+                      TextSpan(
+                        text: 'Passe la ',
+                        style: TextStyle(color: Color(0xFF7C8ED0)),
+                      ),
+                      TextSpan(
+                        text: 'Bombe ',
+                        style: TextStyle(color: Color(0xFFF84C08)),
+                      ),
+                      TextSpan(
+                        text: '!',
+                        style: TextStyle(color: Color(0xFF7C8ED0)),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color(0xFF1D132E),
-                    border: Border.all(
-                      color: Color(0xFFF84C08),
-                      width: 1,
+              ),
+              SizedBox(height: 50),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.transparent,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFFF84C08),
+                          blurRadius: 100,
+                          spreadRadius: 5,
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                Image.asset(
-                  'assets/img/game/bombe.png',
-                  width: 210,
-                  height: 210,
-                  fit: BoxFit.contain,
-                ),
-              ],
-            ),
-            SizedBox(height: 50),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child: _showPlayerChoice
-                        ? _playerChoice()
-                        : _mainMenu(),
+                  Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF1D132E),
+                      border: Border.all(color: Color(0xFFF84C08), width: 1),
+                    ),
                   ),
+                  Image.asset(
+                    'assets/img/game/bombe.png',
+                    width: 210,
+                    height: 210,
+                    fit: BoxFit.contain,
+                  ),
+                ],
+              ),
+              SizedBox(height: 50),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _showPlayerChoice ? _playerChoice() : _mainMenu(),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -137,10 +132,7 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
     return Column(
       key: const ValueKey('mainMenu'),
       children: [
-        _bigButton(
-          label: 'DEMARRER !',
-          onTap: _onPlay,
-        ),
+        _bigButton(label: 'DEMARRER !', onTap: _onPlay),
         SizedBox(height: 20),
         Container(
           decoration: BoxDecoration(
@@ -151,7 +143,10 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -181,7 +176,11 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
               ),
               const SizedBox(height: 3),
               Padding(
-                padding: const EdgeInsets.only(bottom: 8, left: 8, right: 8),  // Léger padding
+                padding: const EdgeInsets.only(
+                  bottom: 8,
+                  left: 8,
+                  right: 8,
+                ), // Léger padding
                 child: Text(
                   "La bombe va exploser! Passez le téléphone à un ami avant la fin du temps. Attention: Si vous le passez trop vite, la bombe explose immédiatement!",
                   style: TextStyle(color: Color(0xFFF84C08), fontSize: 14),
@@ -206,7 +205,7 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
               context,
               MaterialPageRoute(
                 builder: (_) =>
-                const CamilleKazeGamePage(minSeconds: 20, maxSeconds: 30),
+                    const CamilleKazeGamePage(minSeconds: 20, maxSeconds: 30),
               ),
             );
           },
@@ -219,7 +218,7 @@ class _CamilleKazePageState extends State<CamilleKazePage> {
               context,
               MaterialPageRoute(
                 builder: (_) =>
-                const CamilleKazeGamePage(minSeconds: 40, maxSeconds: 55),
+                    const CamilleKazeGamePage(minSeconds: 40, maxSeconds: 55),
               ),
             );
           },

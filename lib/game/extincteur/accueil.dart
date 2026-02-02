@@ -24,115 +24,113 @@ class _ExtincteurPageState extends State<ExtincteurPage> {
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Color(0xFF63CCE9)),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Transform.translate(
-                  offset: const Offset(-8, 4),
-                  child: const Text(
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Transform.translate(
+                    offset: const Offset(-8, 4),
+                    child: const Text(
+                      "L'Extincteur",
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 68,
+                        color: Color(0xFF663A00),
+                      ),
+                    ),
+                  ),
+                  const Text(
                     "L'Extincteur",
                     style: TextStyle(
                       fontFamily: 'Bangers',
                       fontSize: 68,
-                      color: Color(0xFF663A00),
+                      color: Color(0xFFB3B3B3),
                     ),
                   ),
-                ),
-                const Text(
-                  "L'Extincteur",
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    color: Color(0xFFB3B3B3),
-                  ),
-                ),
-              ],
-            ),
-            Transform.translate(
-              offset: const Offset(-6, 4),
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: const TextSpan(
-                  style: TextStyle(fontFamily: 'Caveat', fontSize: 36),
-                  children: [
-                    TextSpan(
-                      text: 'Souffle le plus ',
-                      style: TextStyle(color: Color(0xFF7C8ED0)),
-                    ),
-                    TextSpan(
-                      text: 'longtemps/fort ',
-                      style: TextStyle(color: Color(0xFFB3B3B3)),
-                    ),
-                    TextSpan(
-                      text: '\npossible !',
-                      style: TextStyle(color: Color(0xFF7C8ED0)),
-                    ),
-                  ],
-                ),
+                ],
               ),
-            ),
-            const SizedBox(height: 40),
-            Column(
-              children: [
-                FractionallySizedBox(
-                  widthFactor: 0.80,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ExtincteurTimerGamePage(),
-                        ),
-                      );
-                    },
-                    child: const ModeCard(
-                      title: "Mode Timer",
-                      decorFull: "assets/img/game/feu.png",
-                      decorHeight: 100,
-                      bottom: -15,
-                      scale: 1,
-                      fullFit: BoxFit.cover,
-                      fullBleed: true,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 25),
-                FractionallySizedBox(
-                  widthFactor: 0.80,
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ExtincteurForceGamePage(),
-                        ),
-                      );
-                    },
-                    child: ModeCard(
-                      title: "Mode Force",
-                      decorLeft: "assets/img/game/vent.png",
-                      decorRight: "assets/img/game/vent.png",
-                      decorHeight: 70,
-                      bottom: 20,
-                      scale: 1.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
-                  child: AnimatedSwitcher(
-                    duration: Duration(milliseconds: 200),
-                    child: _mainMenu(),
+              Transform.translate(
+                offset: const Offset(-6, 4),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: const TextSpan(
+                    style: TextStyle(fontFamily: 'Caveat', fontSize: 36),
+                    children: [
+                      TextSpan(
+                        text: 'Souffle le plus ',
+                        style: TextStyle(color: Color(0xFF7C8ED0)),
+                      ),
+                      TextSpan(
+                        text: 'longtemps/fort ',
+                        style: TextStyle(color: Color(0xFFB3B3B3)),
+                      ),
+                      TextSpan(
+                        text: '\npossible !',
+                        style: TextStyle(color: Color(0xFF7C8ED0)),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 40),
+              Column(
+                children: [
+                  FractionallySizedBox(
+                    widthFactor: 0.80,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ExtincteurTimerGamePage(),
+                          ),
+                        );
+                      },
+                      child: const ModeCard(
+                        title: "Mode Timer",
+                        decorFull: "assets/img/game/feu.png",
+                        decorHeight: 100,
+                        bottom: -15,
+                        scale: 1,
+                        fullFit: BoxFit.cover,
+                        fullBleed: true,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 25),
+                  FractionallySizedBox(
+                    widthFactor: 0.80,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ExtincteurForceGamePage(),
+                          ),
+                        );
+                      },
+                      child: ModeCard(
+                        title: "Mode Force",
+                        decorLeft: "assets/img/game/vent.png",
+                        decorRight: "assets/img/game/vent.png",
+                        decorHeight: 70,
+                        bottom: 20,
+                        scale: 1.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: _mainMenu(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

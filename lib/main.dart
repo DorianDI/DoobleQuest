@@ -6,8 +6,12 @@ import 'game/extincteur/accueil.dart';
 import 'game/flashmcclou/accueil.dart';
 import 'game/rockybalbobo/accueil.dart';
 import 'game/squatminer/accueil.dart';
+import 'services/auth_service.dart';
+import 'pages/login_page.dart';
+import 'pages/medecin_page.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -38,6 +42,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isLoggedIn = false;
 
   final List<(String, Widget)> games = [
     ('assets/img/TireCowBoy.png', const TireCowboyPage()),
@@ -49,121 +54,208 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final isLoggedIn = await AuthService.isLoggedIn();
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+    });
+  }
+
+  Future<void> _handleLoginOrMedecinPage() async {
+    if (_isLoggedIn) {
+      // Si connecté, aller vers la page médecin
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const MedecinPage()),
+      );
+
+      // Si l'utilisateur s'est déconnecté, rafraîchir le statut
+      if (result == true) {
+        await _checkLoginStatus();
+      }
+    } else {
+      // Si non connecté, aller vers la page de connexion
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
+
+      // Si connexion réussie, rafraîchir le statut
+      if (result == true) {
+        await _checkLoginStatus();
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1D132E),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 60),
-            Stack(
-              children: [
-                Transform.translate(
-                  offset: const Offset(-8, 4),
-                  child: Text(
-                    'Doodle Quest',
-                    style: const TextStyle(
-                      fontFamily: 'Bangers',
-                      fontSize: 68,
-                      color: Color(0xFFF49A24),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 60),
+              Stack(
+                children: [
+                  Transform.translate(
+                    offset: const Offset(-8, 4),
+                    child: const Text(
+                      'Doodle Quest',
+                      style: TextStyle(
+                        fontFamily: 'Bangers',
+                        fontSize: 68,
+                        color: Color(0xFFF49A24),
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  'Doodle Quest',
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    foreground: Paint()
-                      ..style = PaintingStyle.stroke
-                      ..strokeWidth = 3
-                      ..color = Colors.black,
+                  Text(
+                    'Doodle Quest',
+                    style: TextStyle(
+                      fontFamily: 'Bangers',
+                      fontSize: 68,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 3
+                        ..color = Colors.black,
+                    ),
+                  ),
+                  const Text(
+                    'Doodle Quest',
+                    style: TextStyle(
+                      fontFamily: 'Bangers',
+                      fontSize: 68,
+                      color: Color(0xFF571D7D),
+                    ),
+                  ),
+                ],
+              ),
+              Transform.translate(
+                offset: const Offset(-8, 4),
+                child: RichText(
+                  text: const TextSpan(
+                    style: TextStyle(
+                      fontFamily: 'Caveat',
+                      fontSize: 36,
+                    ),
+                    children: [
+                      TextSpan(text: 'Are you a ', style: TextStyle(color: Color(0xFF7C8ED0))),
+                      TextSpan(text: 'looser ', style: TextStyle(color: Color(0xFFF49A24))),
+                      TextSpan(text: '?', style: TextStyle(color: Color(0xFF7C8ED0))),
+                    ],
                   ),
                 ),
-                const Text(
-                  'Doodle Quest',
-                  style: TextStyle(
-                    fontFamily: 'Bangers',
-                    fontSize: 68,
-                    color: Color(0xFF571D7D),
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 2,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0x00F49A24),
+                          Color(0xFFF49A24),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Transform.translate(
-              offset: const Offset(-8, 4),
-              child: RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontFamily: 'Caveat',
-                    fontSize: 36,
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF49A24),
+                      shape: BoxShape.circle,
+                    ),
                   ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 80,
+                    height: 2,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Color(0xFFF49A24),
+                          Color(0x00F49A24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 15,
+                  childAspectRatio: 1.10,
                   children: [
-                    TextSpan(text: 'Are you a ', style: TextStyle(color: Color(0xFF7C8ED0))),
-                    TextSpan(text: 'looser ', style: TextStyle(color: Color(0xFFF49A24))),
-                    TextSpan(text: '?', style: TextStyle(color: Color(0xFF7C8ED0))),
+                    for (final g in games) _gridItem(context, g.$1, g.$2),
                   ],
                 ),
               ),
-            ),
-            SizedBox(height: 15,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0x00F49A24), // transparent
-                        Color(0xFFF49A24), // plein
+              const SizedBox(height: 30),
+
+              // Bouton de connexion ou accès page médecin
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _handleLoginOrMedecinPage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _isLoggedIn
+                          ? const Color(0xFF571D7D)
+                          : const Color(0xFFF49A24),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      elevation: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _isLoggedIn ? Icons.dashboard : Icons.medical_services,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isLoggedIn ? 'Page Médecin' : 'Connexion Médecin',
+                          style: const TextStyle(
+                            fontFamily: 'Bangers',
+                            fontSize: 20,
+                            letterSpacing: 1,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF49A24),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 80,
-                  height: 2,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFFF49A24),
-                        Color(0x00F49A24),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 15,
-              childAspectRatio: 1.10,
-              children: [
-                for (final g in games) _gridItem(context, g.$1, g.$2),
-              ],
-            )
-          ],
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );

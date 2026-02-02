@@ -20,7 +20,7 @@ class MultiplayerService {
   Function(Map<String, dynamic> result)? onGameOver;
   Function(String socketId)? onPlayerLeft;
   Function(String message)? onError;
-  Function(Map<String, dynamic> players)? onRematchRead;
+  Function(Map<String, dynamic> players)? onRematchReady;
 
   // Connexion au serveur
   void connect(String serverUrl) {
@@ -82,7 +82,7 @@ class MultiplayerService {
     });
 
     _socket!.on('rematch_ready', (data) {
-      onRematchRead?.call(data);
+      onRematchReady?.call(data);
     });
   }
 

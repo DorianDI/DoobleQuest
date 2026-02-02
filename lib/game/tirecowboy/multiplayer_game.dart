@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:dooble_quest/game/tirecowboy/multiplayer_lobby.dart';
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/services.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'multiplayer_service.dart';
+import 'multiplayer_lobby.dart';
 
 class MultiplayerGamePage extends StatefulWidget {
   final String gameCode;
@@ -55,6 +55,7 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
           _message = "TIRE !";
           _signalTime = DateTime.now();
         });
+        // 🔥 Vibrations plus intenses et plus longues
         Future.wait([
           HapticFeedback.heavyImpact(),
           Future.delayed(const Duration(milliseconds: 50), () => HapticFeedback.heavyImpact()),
@@ -68,18 +69,25 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
 
     _service.onPlayerShot = (data) {
       final isMe = (widget.isHost && data['isHost']) || (!widget.isHost && !data['isHost']);
-      
-      if (!isMe) {
-        setState(() {
+
+      setState(() {
+        if (isMe) {
+          if (data['faulStart'] == true) {
+            _iHaveFaulStart = true;
+            _message = "TROP TÔT !";
+          } else {
+            _myReactionTime = data['reactionTime'];
+          }
+        } else {
           _opponentName = data['playerName'];
-          
+
           if (data['faulStart'] == true) {
             _opponentHasFaulStart = true;
           } else {
             _opponentReactionTime = data['reactionTime'];
           }
-        });
-      }
+        }
+      });
     };
 
     _service.onGameOver = (result) {
@@ -120,7 +128,7 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
   void _startAccelerometer() {
     _accelSub = accelerometerEventStream().listen((event) {
       if (_isGameOver || _myReactionTime != null) return;
-      
+
       final force = sqrt(event.x * event.x + event.y * event.y + event.z * event.z);
 
       if (force > sensitivity) {
@@ -149,11 +157,11 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
       // Tir valide
       final now = DateTime.now();
       final reactionTime = now.difference(_signalTime!).inMilliseconds;
-      
+
       setState(() {
         _myReactionTime = reactionTime;
       });
-      
+
       _playShotSound();
       _service.playerShoot(reactionTime);
     }
@@ -237,10 +245,14 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
             if (_isGameOver) ...[
               const SizedBox(height: 40),
               _actionButton("REJOUER", () {
+                // Demander un rematch (réinitialise côté serveur)
                 _service.requestRematch();
-                Navigator.pop(
-                    context,
-                    MaterialPageRoute(builder: (_) => MultiplayerLobbyPage(
+
+                // Retourner au lobby avec les mêmes joueurs
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MultiplayerLobbyPage(
                       isHost: widget.isHost,
                       gameCode: widget.gameCode,
                     ),
@@ -249,7 +261,9 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
               }),
               const SizedBox(height: 10),
               _actionButton("MENU", () {
-                Navigator.pop(context);
+                // Quitter complètement la partie
+                _service.leaveGame();
+                Navigator.popUntil(context, (route) => route.isFirst);
               }),
             ],
           ],
@@ -264,8 +278,8 @@ class _MultiplayerGamePageState extends State<MultiplayerGamePage> {
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.3),
         border: Border.all(
-          color: faulStart 
-              ? Colors.red 
+          color: faulStart
+              ? Colors.red
               : (reactionTime != null ? const Color(0xFFF49A24) : Colors.grey),
           width: 2,
         ),
